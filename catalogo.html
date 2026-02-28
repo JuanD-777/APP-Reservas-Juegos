@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Playres — Catálogo de Juegos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Unica+One&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-playres fixed-top">
+    <div class="container-fluid container">
+      <a class="navbar-brand fw-bold" href="index.html" style="color:aliceblue;">PLAY<span style="color:var(--red);">R</span> <span style="color:aliceblue;">ES</span></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-2 align-items-center">
+          <li class="nav-item"><a class="nav-link" href="catalogo.html">Explorar</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#categorias">Categorías</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#planes">Planes</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#comunidad">Comunidad</a></li>
+        </ul>
+        <div class="d-flex gap-2 ms-lg-3 mt-3 mt-lg-0">
+          <a href="#" class="btn btn-login btn-sm">Iniciar sesión</a>
+          <a href="#" class="btn btn-reservar btn-sm">Reservar ahora →</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HEADER -->
+  <section class="catalog-hero">
+    <div class="container">
+
+      <div class="breadcrumb-playres">
+        <a href="index.html">Inicio</a>
+        <span class="sep">›</span>
+        <span class="current">Catálogo</span>
+      </div>
+
+      <div class="row align-items-end gy-4 mb-4">
+        <div class="col-lg-5">
+          <span class="section-label">Catálogo completo</span>
+          <h1 class="section-title">TODOS LOS<br>JUEGOS</h1>
+        </div>
+        <div class="col-lg-7">
+          <div class="search-box">
+            <div class="search-input-wrapper">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              </svg>
+              <input type="text" id="searchInput" placeholder="Buscar por título, género, plataforma..." oninput="filterGames()">
+            </div>
+            <div class="search-filter" onclick="setFilter('platform','PS5')">🎮 Plataforma ▾</div>
+            <button class="btn-search" onclick="filterGames()">Buscar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros por género -->
+      <div class="filter-tags">
+        <span class="filter-tag active" onclick="setFilter('genre','')">🔥 Todos</span>
+        <span class="filter-tag" onclick="setFilter('genre','Acción')">⚔️ Acción</span>
+        <span class="filter-tag" onclick="setFilter('genre','Aventura')">🌍 Aventura</span>
+        <span class="filter-tag" onclick="setFilter('genre','Deportes')">⚽ Deportes</span>
+        <span class="filter-tag" onclick="setFilter('genre','RPG')">🐉 RPG</span>
+        <span class="filter-tag" onclick="setFilter('genre','Carreras')">🏎️ Carreras</span>
+        <span class="filter-tag" onclick="setFilter('genre','Sci-Fi')">🚀 Sci-Fi</span>
+      </div>
+
+      <!-- Filtros por plataforma -->
+      <div class="filter-tags mt-2">
+        <span class="filter-tag" onclick="setFilter('platform','')">🖥️ Todas</span>
+        <span class="filter-tag" onclick="setFilter('platform','PS5')">PS5</span>
+        <span class="filter-tag" onclick="setFilter('platform','Xbox')">Xbox</span>
+        <span class="filter-tag" onclick="setFilter('platform','Switch')">Switch</span>
+        <span class="filter-tag" onclick="setFilter('platform','PC')">PC</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- GALERÍA DE JUEGOS -->
+  <section class="catalog-section" id="catalogo">
+    <div class="container">
+
+      <!-- Contador resultados -->
+      <div class="catalog-result-bar">
+        <span class="catalog-result-count" id="resultCount">Mostrando 12 juegos</span>
+        <span class="catalog-result-page" id="pageIndicator">Página 1 de 2</span>
+      </div>
+
+      <!-- Grid de juegos -->
+      <div class="row g-4" id="gamesGrid"></div>
+
+      <!-- Paginación Bootstrap -->
+      <div class="d-flex justify-content-center mt-5">
+        <nav>
+          <ul class="pagination pagination-playres" id="pagination"></ul>
+        </nav>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="row gy-4">
+        <div class="col-lg-3 col-md-6">
+          <div class="footer-logo">PLAY<span>RES</span></div>
+          <p class="footer-description">La plataforma colombiana para reservar videojuegos. Más de 3.200 títulos para PS5, Xbox, Switch y PC con entrega a domicilio.</p>
+          <div class="footer-platforms">
+            <span class="footer-platform-badge">PS5</span>
+            <span class="footer-platform-badge">Xbox</span>
+            <span class="footer-platform-badge">Switch</span>
+            <span class="footer-platform-badge">PC</span>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-6 offset-lg-1">
+          <div class="footer-category-title">Explorar</div>
+          <ul class="footer-links">
+            <li><a href="catalogo.html">Catálogo completo</a></li>
+            <li><a href="#">Novedades</a></li>
+            <li><a href="#">Más reservados</a></li>
+            <li><a href="#">Próximamente</a></li>
+            <li><a href="#">Clásicos</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-2 col-md-6">
+          <div class="footer-category-title">Cuenta</div>
+          <ul class="footer-links">
+            <li><a href="#">Mis reservas</a></li>
+            <li><a href="#">Mi lista</a></li>
+            <li><a href="#">Historial</a></li>
+            <li><a href="#">Configuración</a></li>
+            <li><a href="#">Plan actual</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-2 col-md-6">
+          <div class="footer-category-title">Empresa</div>
+          <ul class="footer-links">
+            <li><a href="admin.html"> Panel Admin</a></li>
+            <li><a href="#">Acerca de</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Prensa</a></li>
+            <li><a href="#">Trabaja con nosotros</a></li>
+            <li><a href="#">Contacto</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copyright">© 2025 Playres S.A.S. — Todos los derechos reservados. Hecho en Colombia 🇨🇴</span>
+        <div class="footer-bottom-links">
+          <a href="#">Privacidad</a>
+          <a href="#">Términos</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Navbar scroll
+    window.addEventListener('scroll', () => {
+      document.querySelector('.navbar-playres').classList.toggle('scrolled', window.scrollY > 30);
+    });
+
+    // Datos de juegos
+    const allGames = [
+      { title:'Elden Ring: Shadow of the Erdtree', platform:'PS5',    genre:'RPG',      price:9900, rating:4.9, emoji:'🌌', bg:'game-thumb-purple', tag:'TOP 1',  tagClass:'game-tag-top' },
+      { title:'Spider-Man 2',                      platform:'Xbox',   genre:'Acción',   price:8500, rating:4.8, emoji:'🔴', bg:'game-thumb-red',    tag:'NUEVO',  tagClass:'game-tag-new' },
+      { title:'Zelda: Tears of the Kingdom',       platform:'Switch', genre:'Aventura', price:8900, rating:4.9, emoji:'🌿', bg:'game-thumb-green',  tag:'',       tagClass:'' },
+      { title:'Starfield: Shattered Space',        platform:'PC',     genre:'Sci-Fi',   price:7900, rating:4.5, emoji:'🚀', bg:'game-thumb-blue',   tag:'NUEVO',  tagClass:'game-tag-new' },
+      { title:'Final Fantasy XVI',                 platform:'PS5',    genre:'RPG',      price:8200, rating:4.7, emoji:'⚔️', bg:'game-thumb-purple', tag:'',       tagClass:'' },
+      { title:'Forza Horizon 5: Rally',            platform:'Xbox',   genre:'Carreras', price:7500, rating:4.6, emoji:'🏎️', bg:'game-thumb-red',    tag:'',       tagClass:'' },
+      { title:'FIFA 25',                           platform:'PS5',    genre:'Deportes', price:6900, rating:4.3, emoji:'⚽', bg:'game-thumb-green',  tag:'NUEVO',  tagClass:'game-tag-new' },
+      { title:'Hogwarts Legacy',                   platform:'Switch', genre:'Aventura', price:7800, rating:4.4, emoji:'🐉', bg:'game-thumb-blue',   tag:'',       tagClass:'' },
+      { title:'Call of Duty: Black Ops 6',         platform:'Xbox',   genre:'Acción',   price:9500, rating:4.6, emoji:'🔴', bg:'game-thumb-red',    tag:'NUEVO',  tagClass:'game-tag-new' },
+      { title:'Cyberpunk 2077: Phantom Liberty',   platform:'PC',     genre:'RPG',      price:8800, rating:4.8, emoji:'🌌', bg:'game-thumb-purple', tag:'',       tagClass:'' },
+      { title:'Mario Kart 8 Deluxe',              platform:'Switch', genre:'Carreras', price:6500, rating:4.9, emoji:'🏎️', bg:'game-thumb-green',  tag:'',       tagClass:'' },
+      { title:'Resident Evil 4 Remake',            platform:'PS5',    genre:'Acción',   price:7200, rating:4.8, emoji:'🔴', bg:'game-thumb-red',    tag:'',       tagClass:'' },
+      { title:'God of War: Ragnarök',              platform:'PS5',    genre:'Acción',   price:9200, rating:4.9, emoji:'⚔️', bg:'game-thumb-purple', tag:'TOP',    tagClass:'game-tag-top' },
+      { title:'Halo Infinite',                     platform:'Xbox',   genre:'Acción',   price:7000, rating:4.3, emoji:'🚀', bg:'game-thumb-blue',   tag:'',       tagClass:'' },
+      { title:'Pokémon Scarlet',                   platform:'Switch', genre:'RPG',      price:7500, rating:4.2, emoji:'🐉', bg:'game-thumb-green',  tag:'',       tagClass:'' },
+      { title:'Baldur\'s Gate 3',                  platform:'PC',     genre:'RPG',      price:9800, rating:5.0, emoji:'🌌', bg:'game-thumb-purple', tag:'TOP',    tagClass:'game-tag-top' },
+    ];
+
+    let filteredGames = [...allGames];
+    let currentPage = 1;
+    const perPage = 8;
+    let activeGenre = '';
+    let activePlatform = '';
+
+    // Filtrar por género o plataforma
+    function setFilter(type, value) {
+      if (type === 'genre') {
+        activeGenre = value;
+        document.querySelectorAll('.filter-tags:first-of-type .filter-tag').forEach(t => t.classList.remove('active'));
+      } else {
+        activePlatform = value;
+        document.querySelectorAll('.filter-tags:last-of-type .filter-tag').forEach(t => t.classList.remove('active'));
+      }
+      event.target.classList.add('active');
+      filterGames();
+    }
+
+    function filterGames() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      filteredGames = allGames.filter(g =>
+        (!q              || g.title.toLowerCase().includes(q) || g.genre.toLowerCase().includes(q) || g.platform.toLowerCase().includes(q)) &&
+        (!activeGenre    || g.genre    === activeGenre) &&
+        (!activePlatform || g.platform === activePlatform)
+      );
+      currentPage = 1;
+      renderGames();
+    }
+
+    function renderGames() {
+      const start = (currentPage - 1) * perPage;
+      const slice = filteredGames.slice(start, start + perPage);
+      const grid  = document.getElementById('gamesGrid');
+      const totalPages = Math.ceil(filteredGames.length / perPage);
+
+      // Actualizar contadores
+      document.getElementById('resultCount').textContent = `Mostrando ${filteredGames.length} juego${filteredGames.length !== 1 ? 's' : ''}`;
+      document.getElementById('pageIndicator').textContent = `Página ${currentPage} de ${totalPages || 1}`;
+
+      // Renderizar tarjetas
+      grid.innerHTML = slice.length === 0
+        ? `<div class="col-12 catalog-empty"><p>No se encontraron juegos con ese filtro.</p></div>`
+        : slice.map(g => `
+            <div class="col-lg-3 col-md-4 col-sm-6">
+              <div class="game-card catalog-card">
+                <a href="product-detail.html" class="catalog-card-link">
+                  <div class="game-thumbnail ${g.bg}">
+                    <div class="game-tags">
+                      <span class="game-tag">${g.genre}</span>
+                      ${g.tag ? `<span class="${g.tagClass}">+ ${g.tag}</span>` : ''}
+                    </div>
+                    ${g.emoji}
+                  </div>
+                </a>
+                <div class="game-card-info">
+                  <div class="game-platform">${g.platform}</div>
+                  <h3 class="game-title-catalog">${g.title}</h3>
+                  <div class="game-bottom">
+                    <div class="game-price">$${g.price.toLocaleString('es-CO')}<span>/día</span></div>
+                    <div><span class="game-stars">★★★★★</span><span class="game-rating">${g.rating}</span></div>
+                  </div>
+                  <a href="product-detail.html" class="catalog-btn-ver">Ver detalles →</a>
+                </div>
+              </div>
+            </div>
+          `).join('');
+
+      // Renderizar paginación Bootstrap
+      const pag = document.getElementById('pagination');
+      pag.innerHTML = '';
+
+      // Botón anterior
+      pag.innerHTML += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+          <a class="page-link" href="#catalogo" onclick="goPage(${currentPage - 1})">←</a>
+        </li>`;
+
+      // Números de página
+      for (let i = 1; i <= totalPages; i++) {
+        pag.innerHTML += `
+          <li class="page-item ${i === currentPage ? 'active' : ''}">
+            <a class="page-link" href="#catalogo" onclick="goPage(${i})">${i}</a>
+          </li>`;
+      }
+
+      // Botón siguiente
+      pag.innerHTML += `
+        <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
+          <a class="page-link" href="#catalogo" onclick="goPage(${currentPage + 1})">→</a>
+        </li>`;
+    }
+
+    function goPage(n) {
+      const totalPages = Math.ceil(filteredGames.length / perPage);
+      if (n < 1 || n > totalPages) return;
+      currentPage = n;
+      renderGames();
+    }
+
+    // Iniciar
+    renderGames();
+  </script>
+</body>
+</html>
