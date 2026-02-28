@@ -326,3 +326,139 @@ if (document.getElementById('tableBody')) {
   // Iniciar admin
   renderTable();
 }
+
+
+// ===============================
+// VALIDACIÓN FORMULARIO REGISTRO
+// ===============================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  const form = document.getElementById("registerForm");
+
+  if (!form) return;
+
+  const nombre = document.getElementById("regNombre");
+  const apellido = document.getElementById("regApellido");
+  const email = document.getElementById("regEmail");
+  const password = document.getElementById("regPassword");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    let valid = true;
+
+    // Resetear estados
+    [nombre, apellido, email, password].forEach(input => {
+      input.classList.remove("is-invalid");
+      input.classList.remove("is-valid");
+    });
+
+    // Validar nombre
+    if (nombre.value.trim().length < 2) {
+      nombre.classList.add("is-invalid");
+      valid = false;
+    } else {
+      nombre.classList.add("is-valid");
+    }
+
+    // Validar apellido
+    if (apellido.value.trim().length < 2) {
+      apellido.classList.add("is-invalid");
+      valid = false;
+    } else {
+      apellido.classList.add("is-valid");
+    }
+
+    // Validar email con regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email.value.trim())) {
+      email.classList.add("is-invalid");
+      valid = false;
+    } else {
+      email.classList.add("is-valid");
+    }
+
+    // Validar contraseña mínimo 6 caracteres
+    if (password.value.trim().length < 6) {
+      password.classList.add("is-invalid");
+      valid = false;
+    } else {
+      password.classList.add("is-valid");
+    }
+
+    // Si todo es válido
+    const successMessage = document.getElementById("successMessage");
+
+    successMessage.classList.remove("d-none");
+
+    setTimeout(() => {
+     successMessage.classList.add("d-none");
+     form.reset();
+
+     [nombre, apellido, email, password].forEach(input => {
+     input.classList.remove("is-valid");
+   });
+
+     const modal = bootstrap.Modal.getInstance(document.getElementById("registerModal"));
+     modal.hide();
+
+     }, 1500); 
+
+      // Quitar estilos después de reset
+      [nombre, apellido, email, password].forEach(input => {
+        input.classList.remove("is-valid");
+      });
+
+      const modal = bootstrap.Modal.getInstance(document.getElementById("registerModal"));
+      modal.hide();
+    }
+
+    );
+
+  // ===============================
+// VALIDACIÓN EN TIEMPO REAL
+// ===============================
+
+[nombre, apellido, email, password].forEach(input => {
+  input.addEventListener("input", function () {
+
+    if (input.value.trim() === "") {
+      input.classList.remove("is-valid");
+      input.classList.remove("is-invalid");
+      return;
+    }
+
+    if (input === email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (emailRegex.test(input.value.trim())) {
+        input.classList.add("is-valid");
+        input.classList.remove("is-invalid");
+      } else {
+        input.classList.add("is-invalid");
+        input.classList.remove("is-valid");
+      }
+    } 
+    else if (input === password) {
+      if (input.value.trim().length >= 6) {
+        input.classList.add("is-valid");
+        input.classList.remove("is-invalid");
+      } else {
+        input.classList.add("is-invalid");
+        input.classList.remove("is-valid");
+      }
+    } 
+    else {
+      if (input.value.trim().length >= 2) {
+        input.classList.add("is-valid");
+        input.classList.remove("is-invalid");
+      } else {
+        input.classList.add("is-invalid");
+        input.classList.remove("is-valid");
+      }
+    }
+
+  });
+});
+});
