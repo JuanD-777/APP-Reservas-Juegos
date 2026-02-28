@@ -55,49 +55,45 @@
               </svg>
               <input type="text" id="searchInput" placeholder="Buscar por título, género, plataforma..." oninput="filterGames()">
             </div>
-            <div class="search-filter" onclick="setFilter('platform','PS5')">🎮 Plataforma ▾</div>
             <button class="btn-search" onclick="filterGames()">Buscar</button>
           </div>
         </div>
       </div>
 
-      <!-- Filtros por género -->
+      <!-- Filtros género -->
       <div class="filter-tags">
-        <span class="filter-tag active" onclick="setFilter('genre','')">🔥 Todos</span>
-        <span class="filter-tag" onclick="setFilter('genre','Acción')">⚔️ Acción</span>
-        <span class="filter-tag" onclick="setFilter('genre','Aventura')">🌍 Aventura</span>
-        <span class="filter-tag" onclick="setFilter('genre','Deportes')">⚽ Deportes</span>
-        <span class="filter-tag" onclick="setFilter('genre','RPG')">🐉 RPG</span>
-        <span class="filter-tag" onclick="setFilter('genre','Carreras')">🏎️ Carreras</span>
-        <span class="filter-tag" onclick="setFilter('genre','Sci-Fi')">🚀 Sci-Fi</span>
+        <span class="filter-tag genre-filter-tag active" onclick="setFilter('genre','',this)">🔥 Todos</span>
+        <span class="filter-tag genre-filter-tag" onclick="setFilter('genre','Acción',this)">⚔️ Acción</span>
+        <span class="filter-tag genre-filter-tag" onclick="setFilter('genre','Aventura',this)">🌍 Aventura</span>
+        <span class="filter-tag genre-filter-tag" onclick="setFilter('genre','Deportes',this)">⚽ Deportes</span>
+        <span class="filter-tag genre-filter-tag" onclick="setFilter('genre','RPG',this)">🐉 RPG</span>
+        <span class="filter-tag genre-filter-tag" onclick="setFilter('genre','Carreras',this)">🏎️ Carreras</span>
+        <span class="filter-tag genre-filter-tag" onclick="setFilter('genre','Sci-Fi',this)">🚀 Sci-Fi</span>
       </div>
 
-      <!-- Filtros por plataforma -->
+      <!-- Filtros plataforma -->
       <div class="filter-tags mt-2">
-        <span class="filter-tag" onclick="setFilter('platform','')">🖥️ Todas</span>
-        <span class="filter-tag" onclick="setFilter('platform','PS5')">PS5</span>
-        <span class="filter-tag" onclick="setFilter('platform','Xbox')">Xbox</span>
-        <span class="filter-tag" onclick="setFilter('platform','Switch')">Switch</span>
-        <span class="filter-tag" onclick="setFilter('platform','PC')">PC</span>
+        <span class="filter-tag platform-filter-tag active" onclick="setFilter('platform','',this)">🖥️ Todas</span>
+        <span class="filter-tag platform-filter-tag" onclick="setFilter('platform','PS5',this)">PS5</span>
+        <span class="filter-tag platform-filter-tag" onclick="setFilter('platform','Xbox',this)">Xbox</span>
+        <span class="filter-tag platform-filter-tag" onclick="setFilter('platform','Switch',this)">Switch</span>
+        <span class="filter-tag platform-filter-tag" onclick="setFilter('platform','PC',this)">PC</span>
       </div>
 
     </div>
   </section>
 
-  <!-- GALERÍA DE JUEGOS -->
+  <!-- GALERÍA -->
   <section class="catalog-section" id="catalogo">
     <div class="container">
 
-      <!-- Contador resultados -->
       <div class="catalog-result-bar">
-        <span class="catalog-result-count" id="resultCount">Mostrando 12 juegos</span>
+        <span class="catalog-result-count" id="resultCount">Mostrando 16 juegos</span>
         <span class="catalog-result-page" id="pageIndicator">Página 1 de 2</span>
       </div>
 
-      <!-- Grid de juegos -->
       <div class="row g-4" id="gamesGrid"></div>
 
-      <!-- Paginación Bootstrap -->
       <div class="d-flex justify-content-center mt-5">
         <nav>
           <ul class="pagination pagination-playres" id="pagination"></ul>
@@ -144,12 +140,11 @@
         <div class="col-lg-2 col-md-6">
           <div class="footer-category-title">Empresa</div>
           <ul class="footer-links">
-            <li><a href="admin.html"> Panel Admin</a></li>
             <li><a href="#">Acerca de</a></li>
             <li><a href="#">Blog</a></li>
             <li><a href="#">Prensa</a></li>
             <li><a href="#">Trabaja con nosotros</a></li>
-            <li><a href="#">Contacto</a></li>
+            <li><a href="admin.html">⚙️ Panel Admin</a></li>
           </ul>
         </div>
       </div>
@@ -164,134 +159,7 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Navbar scroll
-    window.addEventListener('scroll', () => {
-      document.querySelector('.navbar-playres').classList.toggle('scrolled', window.scrollY > 30);
-    });
-
-    // Datos de juegos
-    const allGames = [
-      { title:'Elden Ring: Shadow of the Erdtree', platform:'PS5',    genre:'RPG',      price:9900, rating:4.9, emoji:'🌌', bg:'game-thumb-purple', tag:'TOP 1',  tagClass:'game-tag-top' },
-      { title:'Spider-Man 2',                      platform:'Xbox',   genre:'Acción',   price:8500, rating:4.8, emoji:'🔴', bg:'game-thumb-red',    tag:'NUEVO',  tagClass:'game-tag-new' },
-      { title:'Zelda: Tears of the Kingdom',       platform:'Switch', genre:'Aventura', price:8900, rating:4.9, emoji:'🌿', bg:'game-thumb-green',  tag:'',       tagClass:'' },
-      { title:'Starfield: Shattered Space',        platform:'PC',     genre:'Sci-Fi',   price:7900, rating:4.5, emoji:'🚀', bg:'game-thumb-blue',   tag:'NUEVO',  tagClass:'game-tag-new' },
-      { title:'Final Fantasy XVI',                 platform:'PS5',    genre:'RPG',      price:8200, rating:4.7, emoji:'⚔️', bg:'game-thumb-purple', tag:'',       tagClass:'' },
-      { title:'Forza Horizon 5: Rally',            platform:'Xbox',   genre:'Carreras', price:7500, rating:4.6, emoji:'🏎️', bg:'game-thumb-red',    tag:'',       tagClass:'' },
-      { title:'FIFA 25',                           platform:'PS5',    genre:'Deportes', price:6900, rating:4.3, emoji:'⚽', bg:'game-thumb-green',  tag:'NUEVO',  tagClass:'game-tag-new' },
-      { title:'Hogwarts Legacy',                   platform:'Switch', genre:'Aventura', price:7800, rating:4.4, emoji:'🐉', bg:'game-thumb-blue',   tag:'',       tagClass:'' },
-      { title:'Call of Duty: Black Ops 6',         platform:'Xbox',   genre:'Acción',   price:9500, rating:4.6, emoji:'🔴', bg:'game-thumb-red',    tag:'NUEVO',  tagClass:'game-tag-new' },
-      { title:'Cyberpunk 2077: Phantom Liberty',   platform:'PC',     genre:'RPG',      price:8800, rating:4.8, emoji:'🌌', bg:'game-thumb-purple', tag:'',       tagClass:'' },
-      { title:'Mario Kart 8 Deluxe',              platform:'Switch', genre:'Carreras', price:6500, rating:4.9, emoji:'🏎️', bg:'game-thumb-green',  tag:'',       tagClass:'' },
-      { title:'Resident Evil 4 Remake',            platform:'PS5',    genre:'Acción',   price:7200, rating:4.8, emoji:'🔴', bg:'game-thumb-red',    tag:'',       tagClass:'' },
-      { title:'God of War: Ragnarök',              platform:'PS5',    genre:'Acción',   price:9200, rating:4.9, emoji:'⚔️', bg:'game-thumb-purple', tag:'TOP',    tagClass:'game-tag-top' },
-      { title:'Halo Infinite',                     platform:'Xbox',   genre:'Acción',   price:7000, rating:4.3, emoji:'🚀', bg:'game-thumb-blue',   tag:'',       tagClass:'' },
-      { title:'Pokémon Scarlet',                   platform:'Switch', genre:'RPG',      price:7500, rating:4.2, emoji:'🐉', bg:'game-thumb-green',  tag:'',       tagClass:'' },
-      { title:'Baldur\'s Gate 3',                  platform:'PC',     genre:'RPG',      price:9800, rating:5.0, emoji:'🌌', bg:'game-thumb-purple', tag:'TOP',    tagClass:'game-tag-top' },
-    ];
-
-    let filteredGames = [...allGames];
-    let currentPage = 1;
-    const perPage = 8;
-    let activeGenre = '';
-    let activePlatform = '';
-
-    // Filtrar por género o plataforma
-    function setFilter(type, value) {
-      if (type === 'genre') {
-        activeGenre = value;
-        document.querySelectorAll('.filter-tags:first-of-type .filter-tag').forEach(t => t.classList.remove('active'));
-      } else {
-        activePlatform = value;
-        document.querySelectorAll('.filter-tags:last-of-type .filter-tag').forEach(t => t.classList.remove('active'));
-      }
-      event.target.classList.add('active');
-      filterGames();
-    }
-
-    function filterGames() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      filteredGames = allGames.filter(g =>
-        (!q              || g.title.toLowerCase().includes(q) || g.genre.toLowerCase().includes(q) || g.platform.toLowerCase().includes(q)) &&
-        (!activeGenre    || g.genre    === activeGenre) &&
-        (!activePlatform || g.platform === activePlatform)
-      );
-      currentPage = 1;
-      renderGames();
-    }
-
-    function renderGames() {
-      const start = (currentPage - 1) * perPage;
-      const slice = filteredGames.slice(start, start + perPage);
-      const grid  = document.getElementById('gamesGrid');
-      const totalPages = Math.ceil(filteredGames.length / perPage);
-
-      // Actualizar contadores
-      document.getElementById('resultCount').textContent = `Mostrando ${filteredGames.length} juego${filteredGames.length !== 1 ? 's' : ''}`;
-      document.getElementById('pageIndicator').textContent = `Página ${currentPage} de ${totalPages || 1}`;
-
-      // Renderizar tarjetas
-      grid.innerHTML = slice.length === 0
-        ? `<div class="col-12 catalog-empty"><p>No se encontraron juegos con ese filtro.</p></div>`
-        : slice.map(g => `
-            <div class="col-lg-3 col-md-4 col-sm-6">
-              <div class="game-card catalog-card">
-                <a href="product-detail.html" class="catalog-card-link">
-                  <div class="game-thumbnail ${g.bg}">
-                    <div class="game-tags">
-                      <span class="game-tag">${g.genre}</span>
-                      ${g.tag ? `<span class="${g.tagClass}">+ ${g.tag}</span>` : ''}
-                    </div>
-                    ${g.emoji}
-                  </div>
-                </a>
-                <div class="game-card-info">
-                  <div class="game-platform">${g.platform}</div>
-                  <h3 class="game-title-catalog">${g.title}</h3>
-                  <div class="game-bottom">
-                    <div class="game-price">$${g.price.toLocaleString('es-CO')}<span>/día</span></div>
-                    <div><span class="game-stars">★★★★★</span><span class="game-rating">${g.rating}</span></div>
-                  </div>
-                  <a href="product-detail.html" class="catalog-btn-ver">Ver detalles →</a>
-                </div>
-              </div>
-            </div>
-          `).join('');
-
-      // Renderizar paginación Bootstrap
-      const pag = document.getElementById('pagination');
-      pag.innerHTML = '';
-
-      // Botón anterior
-      pag.innerHTML += `
-        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-          <a class="page-link" href="#catalogo" onclick="goPage(${currentPage - 1})">←</a>
-        </li>`;
-
-      // Números de página
-      for (let i = 1; i <= totalPages; i++) {
-        pag.innerHTML += `
-          <li class="page-item ${i === currentPage ? 'active' : ''}">
-            <a class="page-link" href="#catalogo" onclick="goPage(${i})">${i}</a>
-          </li>`;
-      }
-
-      // Botón siguiente
-      pag.innerHTML += `
-        <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}">
-          <a class="page-link" href="#catalogo" onclick="goPage(${currentPage + 1})">→</a>
-        </li>`;
-    }
-
-    function goPage(n) {
-      const totalPages = Math.ceil(filteredGames.length / perPage);
-      if (n < 1 || n > totalPages) return;
-      currentPage = n;
-      renderGames();
-    }
-
-    // Iniciar
-    renderGames();
-  </script>
+  <script src="juegos.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
