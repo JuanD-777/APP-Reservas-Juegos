@@ -787,16 +787,6 @@ _____________________________________________________
 .game-thumb-green { background: linear-gradient(135deg, #001a0d, #002a15); }
 .game-thumb-blue { background: linear-gradient(135deg, #0a0a1a, #101030); }
 
-.game-cover {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
 .game-tags {
   position: absolute;
   top: 10px;
