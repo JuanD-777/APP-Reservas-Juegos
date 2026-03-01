@@ -326,3 +326,118 @@ if (document.getElementById('tableBody')) {
   // Iniciar admin
   renderTable();
 }
+
+/* ACTIVAR SELECCIÓN DE CATEGORÍAS */
+
+document.querySelectorAll('.filter-tag').forEach(tag => {
+  tag.addEventListener('click', function () {
+
+    document.querySelectorAll('.filter-tag')
+      .forEach(t => t.classList.remove('active'));
+
+    this.classList.add('active');
+  });
+});
+
+
+/* AGREGAR NUEVA CATEGORÍA DINÁMICA */
+
+const addCategoryBtn = document.getElementById("addCategoryBtn");
+
+addCategoryBtn.addEventListener("click", () => {
+
+    const nombreCategoria = prompt("Nombre de la nueva categoría:");
+
+    if (!nombreCategoria) return;
+
+    const catGrid = document.querySelector(".cat-grid");
+
+    const nuevaCategoria = document.createElement("a");
+    nuevaCategoria.href = "#";
+    nuevaCategoria.classList.add("cat-card");
+    nuevaCategoria.textContent = nombreCategoria;
+
+    catGrid.appendChild(nuevaCategoria);
+});
+
+
+/* DISPONIBILIDAD DE JUEGOS */
+
+document.querySelectorAll('.game-card').forEach(card => {
+
+  const disponible = Math.random() > 0.3;
+
+  const badge = document.createElement("div");
+  badge.className = disponible
+    ? "status-badge disponible"
+    : "status-badge agotado";
+
+  badge.style.position = "absolute";
+  badge.style.bottom = "10px";
+  badge.style.left = "10px";
+
+  badge.textContent = disponible
+    ? "Disponible"
+    : "Agotado";
+
+  const thumb = card.querySelector(".game-thumbnail");
+  thumb.style.position = "relative";
+  thumb.appendChild(badge);
+});
+
+
+/* MARCAR JUEGOS COMO FAVORITOS */
+
+let favoritos = [];
+
+document.querySelectorAll('.game-card').forEach(card => {
+
+  const favBtn = document.createElement("button");
+  favBtn.innerHTML = "⭐";
+  favBtn.className = "fav-btn";
+
+  favBtn.style.position = "absolute";
+  favBtn.style.top = "260px";
+  favBtn.style.right = "10px";
+
+  const thumb = card.querySelector(".game-thumbnail");
+  thumb.appendChild(favBtn);
+
+  favBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+
+    card.classList.toggle("favorito");
+
+    if (card.classList.contains("favorito")) {
+      favoritos.push(card.cloneNode(true));
+    } else {
+      favoritos = favoritos.filter(f =>
+        f.querySelector(".game-title-catalog").textContent !==
+        card.querySelector(".game-title-catalog").textContent
+      );
+    }
+
+    renderFavoritos();
+  });
+});
+
+
+/* MOSTRAR LISTA DE FAVORITOS */
+
+function renderFavoritos() {
+
+  const grid = document.getElementById("favoritesGrid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+
+  if (favoritos.length === 0) {
+    grid.innerHTML =
+      "<p style='color:gray;'>Aún no tienes favoritos.</p>";
+    return;
+  }
+
+  favoritos.forEach(game => {
+    grid.appendChild(game);
+  });
+}
