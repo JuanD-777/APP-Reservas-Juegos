@@ -75,9 +75,9 @@ if (document.getElementById('gamesGrid')) {
                 <div class="game-thumbnail ${g.bg}">
                   <div class="game-tags">
                     <span class="game-tag">${g.genre}</span>
-                    ${g.tag ? `<span class="${g.tagClass}">+ ${g.tag}</span>` : ''}
+                    ${g.tag ? `<span class="${g.tagClass}">${g.tag}</span>` : ''}
                   </div>
-                  ${g.emoji}
+                  <img class="game-cover" src="assests/${g.image}" alt="${g.title}">
                 </div>
               </a>
               <div class="game-card-info">
@@ -181,7 +181,7 @@ if (document.getElementById('tableBody')) {
         <tr>
           <td>
             <div class="tbl-game-info">
-              <div class="tbl-thumb ${p.bg}">${p.emoji}</div>
+              <div class="tbl-thumb ${p.bg}"><img class="tbl-cover" src="assests/${p.image}" alt="${p.title}"></div>
               <div>
                 <div class="tbl-game-name">${p.title}</div>
                 <div class="tbl-game-id">${p.id}</div>
@@ -262,7 +262,6 @@ if (document.getElementById('tableBody')) {
     document.getElementById('fPlatform').value  = p.platform;
     document.getElementById('fGenre').value     = p.genre;
     document.getElementById('fStatus').value    = p.status;
-    document.getElementById('fEmoji').value     = p.emoji;
     new bootstrap.Modal(document.getElementById('productModal')).show();
   };
 
@@ -283,7 +282,6 @@ if (document.getElementById('tableBody')) {
       rating:   parseFloat(document.getElementById('fRating').value) || 4.5,
       stock: document.getElementById('fStock').value !== '' ? parseInt(document.getElementById('fStock').value) : (idx >= 0 ? products[idx].stock : 0),
       status:   document.getElementById('fStatus').value,
-      emoji:    document.getElementById('fEmoji').value,
       bg:       bgMap[platform] || 'game-thumb-purple',
       tag: '', tagClass: '', description: '',
     };
