@@ -239,6 +239,16 @@
         <a href="#" class="cat-card"><span class="category-emoji">🐉</span><span class="category-name">RPG</span><span class="category-count">387 juegos</span></a>
         <a href="#" class="cat-card"><span class="category-emoji">🏎️</span><span class="category-name">Carreras</span><span class="category-count">144 juegos</span></a>
       </div>
+      <!-- BOTÓN AGREGAR CATEGORÍA -->
+      <div style="text-align:center; margin-top:20px;">
+  <button
+    class="btn-add-category"
+    data-bs-toggle="modal"
+    data-bs-target="#addCategoryModal">
+    Agregar categoría
+  </button>
+</div>
+
     </div>
   </section>
 
@@ -314,6 +324,17 @@
       </div>
     </div>
   </section>
+  <!-- LISTA DE FAVORITOS -->
+<section class="catalog-section">
+  <div class="container">
+    <span class="section-label">Tus juegos</span>
+    <h2 class="section-title">FAVORITOS ⭐</h2>
+
+    <div class="games-grid" id="favoritesGrid">
+      <p style="color:gray;">Aún no tienes favoritos.</p>
+    </div>
+  </div>
+</section>
 
   <!-- CÓMO FUNCIONA -->
   <section class="how-section" id="como-funciona">
@@ -666,5 +687,41 @@
   <script src="js/app.js"></script>
   <script src="js/juegos.js"></script>
 
+  <!-- =========================================
+ MODAL: AGREGAR NUEVA CATEGORÍA
+========================================= -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content custom-modal">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Agregar categoría</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <form id="addCategoryForm">
+
+          <label class="form-label">Nombre de la categoría</label>
+          <input 
+            type="text"
+            id="categoryNameInput"
+            class="form-control"
+            placeholder="Ej: Estrategia"
+            required
+          >
+
+          <button type="submit" class="btn-add-category w-100 mt-4">
+            Crear categoría
+          </button>
+
+        </form>
+
+      </div>
+
+    </div>
+  </div>
+</div>
 </body>
 </html>

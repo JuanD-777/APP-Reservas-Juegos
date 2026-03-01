@@ -439,6 +439,155 @@ window.cerrarSesion = function() {
 // Al cargar la página, verificamos si ya había una sesión iniciada
 document.addEventListener("DOMContentLoaded", actualizarInterfaz);
 
+/* ACTIVAR SELECCIÓN DE CATEGORÍAS */
+
+document.querySelectorAll('.filter-tag').forEach(tag => {
+  tag.addEventListener('click', function () {
+
+    document.querySelectorAll('.filter-tag')
+      .forEach(t => t.classList.remove('active'));
+
+    this.classList.add('active');
+  });
+});
 
 
+/* =========================================
+   AGREGAR NUEVA CATEGORÍA DESDE MODAL
+========================================= */
 
+document.addEventListener("DOMContentLoaded", () => {
+
+  const categoryForm = document.getElementById("addCategoryForm");
+
+  if (!categoryForm) return;
+
+  categoryForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const nombreCategoria =
+      document.getElementById("categoryNameInput").value.trim();
+
+    if (!nombreCategoria) return;
+
+    const catGrid = document.querySelector(".cat-grid");
+
+    const nuevaCategoria = document.createElement("a");
+    nuevaCategoria.href = "#";
+    nuevaCategoria.classList.add("cat-card");
+
+    nuevaCategoria.innerHTML = `
+      <div style="font-size:40px; margin-bottom:10px;">🎮</div>
+      <h3 style="color:white; font-size:18px; margin:5px 0;">
+        ${nombreCategoria}
+      </h3>
+      <p style="color:#8b9bb4; font-size:14px;">
+        Nuevo
+    `;
+
+    catGrid.appendChild(nuevaCategoria);
+
+    categoryForm.reset();
+
+    const modal = bootstrap.Modal.getInstance(
+      document.getElementById("addCategoryModal")
+    );
+
+    modal.hide();
+  });
+
+});
+
+
+/* DISPONIBILIDAD DE JUEGOS */
+
+document.querySelectorAll('.game-card').forEach(card => {
+
+  const disponible = Math.random() > 0.3;
+
+  const badge = document.createElement("div");
+  badge.className = disponible
+    ? "status-badge disponible"
+    : "status-badge agotado";
+
+  badge.style.position = "absolute";
+  badge.style.bottom = "10px";
+  badge.style.left = "10px";
+
+  badge.textContent = disponible
+    ? "Disponible"
+    : "Agotado";
+
+  const thumb = card.querySelector(".game-thumbnail");
+  thumb.style.position = "relative";
+  thumb.appendChild(badge);
+});
+
+
+/* =========================================
+   MARCAR / ELIMINAR JUEGOS FAVORITOS
+========================================= */
+
+let favoritos = [];
+
+document.querySelectorAll('.game-card').forEach(card => {
+
+  const favBtn = document.createElement("button");
+  favBtn.innerHTML = "⭐";
+  favBtn.className = "fav-btn";
+
+  favBtn.style.position = "absolute";
+  favBtn.style.top = "260px";
+  favBtn.style.right = "10px";
+
+  const thumb = card.querySelector(".game-thumbnail");
+  thumb.style.position = "relative";
+  thumb.appendChild(favBtn);
+
+  favBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+
+    const titulo =
+      card.querySelector(".game-title-catalog").textContent;
+
+    // SI YA ES FAVORITO → ELIMINAR
+    if (card.classList.contains("favorito")) {
+
+      card.classList.remove("favorito");
+
+      favoritos = favoritos.filter(game =>
+        game.querySelector(".game-title-catalog").textContent !== titulo
+      );
+
+    } 
+    // SI NO ES FAVORITO → AGREGAR
+    else {
+
+      card.classList.add("favorito");
+
+      favoritos.push(card.cloneNode(true));
+    }
+
+    renderFavoritos();
+  });
+});
+
+/* MOSTRAR LISTA DE FAVORITOS */
+
+function renderFavoritos() {
+
+  const grid = document.getElementById("favoritesGrid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+
+  if (favoritos.length === 0) {
+    grid.innerHTML =
+      "<p style='color:gray;'>Aún no tienes favoritos.</p>";
+    return;
+  }
+
+  favoritos.forEach(game => {
+    grid.appendChild(game);
+  });
+}
