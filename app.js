@@ -328,192 +328,117 @@ if (document.getElementById('tableBody')) {
 }
 
 
-// ===============================
-// VALIDACIÓN FORMULARIO REGISTRO
-// ===============================
-
-document.addEventListener("DOMContentLoaded", function () {
-
-  const form = document.getElementById("registerForm");
-
-  if (!form) return;
-
-  const nombre = document.getElementById("regNombre");
-  const apellido = document.getElementById("regApellido");
-  const email = document.getElementById("regEmail");
-  const password = document.getElementById("regPassword");
-
-  form.addEventListener("submit", function (e) {
+// ==========================================
+// 1. REGISTRO DE USUARIO
+// ==========================================
+const registerForm = document.getElementById("registerForm");
+if (registerForm) {
+  registerForm.addEventListener("submit", function (e) {
     e.preventDefault();
 
-    let valid = true;
+    // Creamos el objeto con los datos del formulario
+    const nuevoUsuario = {
+      nombre: document.getElementById("regNombre").value.trim(),
+      apellido: document.getElementById("regApellido").value.trim(),
+      email: document.getElementById("regEmail").value.trim(),
+      password: document.getElementById("regPassword").value.trim()
+    };
 
-    // Resetear estados
-    [nombre, apellido, email, password].forEach(input => {
-      input.classList.remove("is-invalid");
-      input.classList.remove("is-valid");
-    });
+    // Guardamos en el "disco duro" del navegador
+    localStorage.setItem("usuarioRegistrado", JSON.stringify(nuevoUsuario));
 
-    // Validar nombre
-    if (nombre.value.trim().length < 2) {
-      nombre.classList.add("is-invalid");
-      valid = false;
-    } else {
-      nombre.classList.add("is-valid");
-    }
-
-    // Validar apellido
-    if (apellido.value.trim().length < 2) {
-      apellido.classList.add("is-invalid");
-      valid = false;
-    } else {
-      apellido.classList.add("is-valid");
-    }
-
-    // Validar email con regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.value.trim())) {
-      email.classList.add("is-invalid");
-      valid = false;
-    } else {
-      email.classList.add("is-valid");
-    }
-
-    // Validar contraseña mínimo 6 caracteres
-    if (password.value.trim().length < 6) {
-      password.classList.add("is-invalid");
-      valid = false;
-    } else {
-      password.classList.add("is-valid");
-    }
-
-    // 🔴 SOLUCIÓN: Solo ejecutamos el éxito si 'valid' se mantuvo en true
-    if (valid) {
-      
-      // 1. Guardar usuario en localStorage (Movido aquí adentro)
-      const userData = {
-        nombre: nombre.value.trim(),
-        apellido: apellido.value.trim(),
-        email: email.value.trim(),
-        password: password.value.trim()
-      };
-      localStorage.setItem("usuarioRegistrado", JSON.stringify(userData));
-
-      // 2. Mostrar mensaje de éxito
-      const successMessage = document.getElementById("successMessage");
-      if (successMessage) successMessage.classList.remove("d-none");
-
-      // 3. Esperar 1.5 segundos, luego limpiar y cerrar
-      setTimeout(() => {
-        if (successMessage) successMessage.classList.add("d-none");
-        form.reset();
-
-        [nombre, apellido, email, password].forEach(input => {
-          input.classList.remove("is-valid");
-        });
-
-        // Asegurarnos de obtener la instancia correcta del modal de Bootstrap
-        const modalEl = document.getElementById("registerModal");
-        if (modalEl) {
-          const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-          modal.hide();
-        }
-
-      }, 2000); 
-    }
+    // Mostrar mensaje de éxito y limpiar
+    document.getElementById("successMessage").classList.remove("d-none");
+    registerForm.reset();
+    
+    
+    setTimeout(() => {
+      const modal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
+      modal.hide();
+      document.getElementById("successMessage").classList.add("d-none");
+    }, 2000);
   });
+}
 
-  // ===============================
-  // VALIDACIÓN EN TIEMPO REAL
-  // ===============================
-
-  [nombre, apellido, email, password].forEach(input => {
-    input.addEventListener("input", function () {
-
-      if (input.value.trim() === "") {
-        input.classList.remove("is-valid");
-        input.classList.remove("is-invalid");
-        return;
-      }
-
-      if (input === email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (emailRegex.test(input.value.trim())) {
-          input.classList.add("is-valid");
-          input.classList.remove("is-invalid");
-        } else {
-          input.classList.add("is-invalid");
-          input.classList.remove("is-valid");
-        }
-      } 
-      else if (input === password) {
-        if (input.value.trim().length >= 6) {
-          input.classList.add("is-valid");
-          input.classList.remove("is-invalid");
-        } else {
-          input.classList.add("is-invalid");
-          input.classList.remove("is-valid");
-        }
-      } 
-      else {
-        if (input.value.trim().length >= 2) {
-          input.classList.add("is-valid");
-          input.classList.remove("is-invalid");
-        } else {
-          input.classList.add("is-invalid");
-          input.classList.remove("is-valid");
-        }
-      }
-
-    });
-  });
-
-
-
-
-// ===============================
-// LOGIN DE USUARIO
-// ===============================
-
-const loginForm = document.getElementById("loginForm");
-
-if (loginForm) {
-
+// ==========================================
+// 2. LOGIN DE USUARIO
+// ==========================================
+  const loginForm = document.getElementById("loginForm");
+  if (loginForm) {
   loginForm.addEventListener("submit", function (e) {
     e.preventDefault();
 
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value.trim();
-    const errorMessage = document.getElementById("loginError");
+    const emailInput = document.getElementById("loginEmail").value.trim();
+    const passInput = document.getElementById("loginPassword").value.trim();
+    const errorMsg = document.getElementById("loginError");
 
-    const storedUser = JSON.parse(localStorage.getItem("usuarioRegistrado"));
+    // Traemos al usuario que se registró antes
+    const usuarioGuardado = JSON.parse(localStorage.getItem("usuarioRegistrado"));
 
-    if (!storedUser) {
-      errorMessage.textContent = "No existe ningún usuario registrado.";
-      errorMessage.classList.remove("d-none");
-      return;
-    }
-
-    if (email === storedUser.email && password === storedUser.password) {
-
-      localStorage.setItem("usuarioActivo", JSON.stringify(storedUser));
-
-      errorMessage.classList.add("d-none");
-
-      const modal = bootstrap.Modal.getInstance(document.getElementById("loginModal"));
+    if (usuarioGuardado && emailInput === usuarioGuardado.email && passInput === usuarioGuardado.password) {
+      
+    
+      localStorage.setItem("usuarioActivo", JSON.stringify(usuarioGuardado));
+      
+      // Cerramos el modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
       modal.hide();
+      loginForm.reset();
+      errorMsg.classList.add("d-none");
 
-      actualizarNavbar();
-
+      // ¡IMPORTANTE! se llama a la funcion para cambiar la interfaz 
+      actualizarInterfaz();
     } else {
-      errorMessage.textContent = "Correo o contraseña incorrectos.";
-      errorMessage.classList.remove("d-none");
+      // ERROR
+      errorMsg.textContent = "Datos incorrectos o usuario no registrado.";
+      errorMsg.classList.remove("d-none");
     }
-
   });
-
 }
 
+// ==========================================
+// 3. CAMBIO DE LOS BOTONES POR EL PERFIL
+// ==========================================
+function actualizarInterfaz() {
+  const sesion = JSON.parse(localStorage.getItem("usuarioActivo"));
+  
+  const botonesAuth = document.getElementById("navAuthButtons");
+  const perfilUsuario = document.getElementById("navUserProfile");
+  const nombreTxt = document.getElementById("userNameDisplay");
+  const avatarCirculo = document.getElementById("userAvatarInitials");
+
+  if (sesion) {
+    // una vez logueado se esconden los botones 
+    if (botonesAuth) botonesAuth.classList.add("d-none"); // se esconde el Login/Registro
+    if (perfilUsuario) perfilUsuario.classList.remove("d-none"); // Mostramos Perfil
+    
+    // Ponemos el nombre
+    if (nombreTxt) nombreTxt.textContent = sesion.nombre;
+
+    // Creamos las iniciales (Ej: Juan Perez -> JP)
+    if (avatarCirculo) {
+      const inicialN = sesion.nombre.charAt(0).toUpperCase();
+      const inicialA = sesion.apellido ? sesion.apellido.charAt(0).toUpperCase() : "";
+      avatarCirculo.textContent = inicialN + inicialA;
+    }
+  } else {
+    // Si no hay sesión (Cerró sesión o nunca entró)
+    if (botonesAuth) botonesAuth.classList.remove("d-none");
+    if (perfilUsuario) perfilUsuario.classList.add("d-none");
+  }
+}
+
+// ==========================================
+// 4. CERRAR SESIÓN
+// ==========================================
+window.cerrarSesion = function() {
+  localStorage.removeItem("usuarioActivo");
+  actualizarInterfaz();
+};
+
+// Al cargar la página, verificamos si ya había una sesión iniciada
+document.addEventListener("DOMContentLoaded", actualizarInterfaz);
 
 
-});
+
+
