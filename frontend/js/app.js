@@ -23,6 +23,11 @@ if (navbar) {
 // ════════════════════════════════════════════════════════════
 if (document.getElementById('gamesGrid')) {
 
+  cargarJuegosAPI().then(() => {
+  filteredGames = [...juegos];
+  renderGames();
+});
+
   let filteredGames = [...juegos];
   let currentPage   = 1;
   const perPage     = 8;
