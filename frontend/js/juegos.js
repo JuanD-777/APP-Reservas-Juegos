@@ -3,245 +3,57 @@
 //  Importar en: catalogo.html, product-detail.html, admin.html
 // ════════════════════════════════════════════════════════════
 
-const juegos = [
-  {
-    id: 'PLY-001',
-    title: 'Elden Ring: Shadow of the Erdtree',
-    platform: 'PS5',
-    genre: 'RPG',
-    price: 9900,
-    rating: 4.9,
-    stock: 120,
-    status: 'disponible',
-    emoji: '🌌',
-    bg: 'game-thumb-purple',
-    tag: 'TOP 1',
-    tagClass: 'game-tag-top',
-    description: 'La expansión definitiva de Elden Ring. Nuevos jefes, armas y un mapa completamente nuevo.',
-  },
-  {
-    id: 'PLY-002',
-    title: 'Spider-Man 2',
-    platform: 'Xbox',
-    genre: 'Acción',
-    price: 8500,
-    rating: 4.8,
-    stock: 85,
-    status: 'reservado',
-    emoji: '🔴',
-    bg: 'game-thumb-red',
-    tag: 'NUEVO',
-    tagClass: 'game-tag-new',
-    description: 'Peter Parker y Miles Morales se unen para enfrentar a Kraven el Cazador y Venom.',
-  },
-  {
-    id: 'PLY-003',
-    title: 'Zelda: Tears of the Kingdom',
-    platform: 'Switch',
-    genre: 'Aventura',
-    price: 8900,
-    rating: 4.9,
-    stock: 200,
-    status: 'disponible',
-    emoji: '🌿',
-    bg: 'game-thumb-green',
-    tag: '',
-    tagClass: '',
-    description: 'Link regresa a Hyrule en una nueva aventura épica con mecánicas de construcción.',
-  },
-  {
-    id: 'PLY-004',
-    title: 'Starfield: Shattered Space',
-    platform: 'PC',
-    genre: 'Sci-Fi',
-    price: 7900,
-    rating: 4.5,
-    stock: 60,
-    status: 'disponible',
-    emoji: '🚀',
-    bg: 'game-thumb-blue',
-    tag: 'NUEVO',
-    tagClass: 'game-tag-new',
-    description: 'Explora cientos de planetas en la primera nueva IP de Bethesda en 25 años.',
-  },
-  {
-    id: 'PLY-005',
-    title: 'Final Fantasy XVI',
-    platform: 'PS5',
-    genre: 'RPG',
-    price: 8200,
-    rating: 4.7,
-    stock: 45,
-    status: 'disponible',
-    emoji: '⚔️',
-    bg: 'game-thumb-purple',
-    tag: '',
-    tagClass: '',
-    description: 'Una historia épica de magia, política y guerra en el mundo de Valisthea.',
-  },
-  {
-    id: 'PLY-006',
-    title: 'Forza Horizon 5: Rally',
-    platform: 'Xbox',
-    genre: 'Carreras',
-    price: 7500,
-    rating: 4.6,
-    stock: 0,
-    status: 'agotado',
-    emoji: '🏎️',
-    bg: 'game-thumb-red',
-    tag: '',
-    tagClass: '',
-    description: 'La mejor experiencia de carreras en mundo abierto ambientada en México.',
-  },
-  {
-    id: 'PLY-007',
-    title: 'FIFA 25',
-    platform: 'PS5',
-    genre: 'Deportes',
-    price: 6900,
-    rating: 4.3,
-    stock: 300,
-    status: 'disponible',
-    emoji: '⚽',
-    bg: 'game-thumb-green',
-    tag: 'NUEVO',
-    tagClass: 'game-tag-new',
-    description: 'La edición más completa del simulador de fútbol más popular del mundo.',
-  },
-  {
-    id: 'PLY-008',
-    title: 'Hogwarts Legacy',
-    platform: 'Switch',
-    genre: 'Aventura',
-    price: 7800,
-    rating: 4.4,
-    stock: 75,
-    status: 'reservado',
-    emoji: '🐉',
-    bg: 'game-thumb-blue',
-    tag: '',
-    tagClass: '',
-    description: 'Vive tu propia historia en el mundo mágico de Harry Potter en el siglo XIX.',
-  },
-  {
-    id: 'PLY-009',
-    title: 'Call of Duty: Black Ops 6',
-    platform: 'Xbox',
-    genre: 'Acción',
-    price: 9500,
-    rating: 4.6,
-    stock: 150,
-    status: 'disponible',
-    emoji: '🔴',
-    bg: 'game-thumb-red',
-    tag: 'NUEVO',
-    tagClass: 'game-tag-new',
-    description: 'La entrega más ambiciosa de la franquicia con multijugador renovado.',
-  },
-  {
-    id: 'PLY-010',
-    title: 'Cyberpunk 2077: Phantom Liberty',
-    platform: 'PC',
-    genre: 'RPG',
-    price: 8800,
-    rating: 4.8,
-    stock: 90,
-    status: 'disponible',
-    emoji: '🌌',
-    bg: 'game-thumb-purple',
-    tag: '',
-    tagClass: '',
-    description: 'La expansión espía de Cyberpunk 2077 con una historia completamente nueva.',
-  },
-  {
-    id: 'PLY-011',
-    title: 'Mario Kart 8 Deluxe',
-    platform: 'Switch',
-    genre: 'Carreras',
-    price: 6500,
-    rating: 4.9,
-    stock: 250,
-    status: 'reservado',
-    emoji: '🏎️',
-    bg: 'game-thumb-green',
-    tag: '',
-    tagClass: '',
-    description: 'El juego de carreras más divertido para toda la familia en Nintendo Switch.',
-  },
-  {
-    id: 'PLY-012',
-    title: 'Resident Evil 4 Remake',
-    platform: 'PS5',
-    genre: 'Acción',
-    price: 7200,
-    rating: 4.8,
-    stock: 110,
-    status: 'disponible',
-    emoji: '🔴',
-    bg: 'game-thumb-red',
-    tag: '',
-    tagClass: '',
-    description: 'El remake definitivo del clásico survival horror con gráficos de nueva generación.',
-  },
-  {
-    id: 'PLY-013',
-    title: 'God of War: Ragnarök',
-    platform: 'PS5',
-    genre: 'Acción',
-    price: 9200,
-    rating: 4.9,
-    stock: 80,
-    status: 'disponible',
-    emoji: '⚔️',
-    bg: 'game-thumb-purple',
-    tag: 'TOP',
-    tagClass: 'game-tag-top',
-    description: 'Kratos y Atreus enfrentan el fin del mundo nórdico en esta épica continuación.',
-  },
-  {
-    id: 'PLY-014',
-    title: 'Halo Infinite',
-    platform: 'Xbox',
-    genre: 'Acción',
-    price: 7000,
-    rating: 4.3,
-    stock: 95,
-    status: 'disponible',
-    emoji: '🚀',
-    bg: 'game-thumb-blue',
-    tag: '',
-    tagClass: '',
-    description: 'El Jefe Maestro regresa en la aventura de mundo abierto más grande de Halo.',
-  },
-  {
-    id: 'PLY-015',
-    title: 'Pokémon Scarlet',
-    platform: 'Switch',
-    genre: 'RPG',
-    price: 7500,
-    rating: 4.2,
-    stock: 180,
-    status: 'disponible',
-    emoji: '🐉',
-    bg: 'game-thumb-green',
-    tag: '',
-    tagClass: '',
-    description: 'Explora la región de Paldea en el primer juego Pokémon de mundo abierto.',
-  },
-  {
-    id: 'PLY-016',
-    title: "Baldur's Gate 3",
-    platform: 'PC',
-    genre: 'RPG',
-    price: 9800,
-    rating: 5.0,
-    stock: 70,
-    status: 'disponible',
-    emoji: '🌌',
-    bg: 'game-thumb-purple',
-    tag: 'TOP',
-    tagClass: 'game-tag-top',
-    description: 'El RPG más aclamado de la década con libertad total de decisiones y cooperativo.',
-  },
-];
+const juegos = [];
+
+async function cargarJuegosAPI() {
+
+  const API_KEY = "801260fce8c34873904ab1f0d8669823";
+
+  const url = `https://api.rawg.io/api/games?key=${API_KEY}&page_size=40`;
+
+  try {
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    data.results.forEach(game => {
+
+  let generoAPI = game.genres.length ? game.genres[0].name : "";
+
+  let genero = "Acción";
+
+  if (generoAPI === "Action") genero = "Acción";
+  if (generoAPI === "Adventure") genero = "Aventura";
+  if (generoAPI === "Sports") genero = "Deportes";
+  if (generoAPI === "Racing") genero = "Carreras";
+  if (generoAPI === "RPG") genero = "RPG";
+  if (generoAPI === "Shooter") genero = "Shooter";
+
+  const plataformas = ["PS5", "Xbox", "Switch", "PC"];
+  const plataformaRandom = plataformas[Math.floor(Math.random() * plataformas.length)];
+
+  juegos.push({
+    id: game.id,
+    title: game.name,
+    genre: genero,
+    platform: plataformaRandom,
+    price: (Math.random() * 50000) + 5000,
+    rating: game.rating,
+    stock: 50,
+    status: "disponible",
+    emoji: "🎮",
+    bg: "game-thumb-blue",
+    tag: "",
+    tagClass: "",
+    description: game.slug
+  });
+
+});
+
+  } catch (error) {
+
+    console.error("Error cargando API:", error);
+
+  }
+
+}
