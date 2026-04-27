@@ -8,6 +8,7 @@ public class ReservaDTO {
     private Long productoId;
     private LocalDate fechaReserva;
     private LocalDate fechaDevolucion;
+    private String tipo;
 
     public ReservaDTO() {}
 
@@ -25,4 +26,12 @@ public class ReservaDTO {
 
     public LocalDate getFechaDevolucion() { return fechaDevolucion; }
     public void setFechaDevolucion(LocalDate fechaDevolucion) { this.fechaDevolucion = fechaDevolucion; }
+
+    public String getTipo() {
+    return tipo;
+    }
+
+    public void setTipo(String tipo) {
+    this.tipo = tipo;
+    }
 }
