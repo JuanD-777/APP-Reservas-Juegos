@@ -6,46 +6,33 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class ProductoService {
-
     private final List<Producto> productos = new ArrayList<>();
-    private final AtomicLong idGenerator = new AtomicLong(1);
+    private static Long contador = 1L;
 
-    public List<Producto> listarTodos() {
-        return productos;
-    }
-
-    public Optional<Producto> buscarPorId(Long id) {
-        return productos.stream().filter(p -> p.getId().equals(id)).findFirst();
-    }
-
-    public Producto crear(ProductoDTO dto) {
+    public Producto crearProducto(ProductoDTO dto) {
         Producto producto = new Producto(
-                idGenerator.getAndIncrement(),
+                contador++,
                 dto.getNombre(),
+                dto.getCategoria(),
                 dto.getDescripcion(),
                 dto.getPrecio(),
-                dto.getCategoriaNombre()
+                true // disponible por defecto
         );
         productos.add(producto);
         return producto;
     }
 
-    public Optional<Producto> actualizar(Long id, ProductoDTO dto) {
-        return buscarPorId(id).map(prod -> {
-            prod.setNombre(dto.getNombre());
-            prod.setDescripcion(dto.getDescripcion());
-            prod.setPrecio(dto.getPrecio());
-            prod.setCategoriaNombre(dto.getCategoriaNombre());
-            return prod;
-        });
+    public List<Producto> listarProductos() {
+        return productos;
     }
 
-    public boolean eliminar(Long id) {
-        return productos.removeIf(p -> p.getId().equals(id));
+    public Producto obtenerProducto(Long id) {
+        return productos.stream()
+                .filter(p -> p.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 }

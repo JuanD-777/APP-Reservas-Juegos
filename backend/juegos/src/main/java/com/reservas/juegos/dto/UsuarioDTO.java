@@ -5,6 +5,7 @@ public class UsuarioDTO {
     private String correo;
 
     public UsuarioDTO() {}
+
     public UsuarioDTO(String nombre, String correo) {
         this.nombre = nombre;
         this.correo = correo;

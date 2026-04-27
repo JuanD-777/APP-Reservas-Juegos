@@ -1,8 +1,9 @@
 package com.reservas.juegos.controller;
 
+import com.reservas.juegos.dto.FavoritoDTO;
 import com.reservas.juegos.entities.Favorito;
 import com.reservas.juegos.service.FavoritoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,22 +11,20 @@ import java.util.List;
 @RestController
 @RequestMapping("/favoritos")
 public class FavoritoController {
+    private final FavoritoService favoritoService;
 
-    @Autowired
-    private FavoritoService favoritoService;
-
-    @PostMapping
-    public Favorito marcarFavorito(@RequestParam Long usuarioId, @RequestParam Long productoId) {
-        return favoritoService.marcarFavorito(usuarioId, productoId);
+    public FavoritoController(FavoritoService favoritoService) {
+        this.favoritoService = favoritoService;
     }
 
-    @GetMapping("/{usuarioId}")
-    public List<Favorito> listarFavoritos(@PathVariable Long usuarioId) {
-        return favoritoService.listarFavoritos(usuarioId);
+    @PostMapping("/crear")
+    public ResponseEntity<Favorito> crear(@RequestBody FavoritoDTO dto) {
+        Favorito favorito = favoritoService.crearFavorito(dto);
+        return ResponseEntity.ok(favorito);
     }
 
-    @DeleteMapping
-    public boolean eliminarFavorito(@RequestParam Long usuarioId, @RequestParam Long productoId) {
-        return favoritoService.eliminarFavorito(usuarioId, productoId);
+    @GetMapping
+    public ResponseEntity<List<Favorito>> listar() {
+        return ResponseEntity.ok(favoritoService.listarFavoritos());
     }
 }

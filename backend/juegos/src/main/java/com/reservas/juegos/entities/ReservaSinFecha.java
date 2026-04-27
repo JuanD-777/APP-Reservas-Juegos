@@ -1,8 +1,7 @@
 package com.reservas.juegos.entities;
 
 public class ReservaSinFecha extends Reserva {
-    @Override
-    public String getDetalles() {
-        return "Reserva sin fecha definida";
+    public ReservaSinFecha(Long id, String detalles, Usuario usuario, Producto producto) {
+        super(id, detalles, usuario, producto);
     }
 }

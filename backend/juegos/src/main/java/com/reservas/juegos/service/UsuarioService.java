@@ -1,7 +1,7 @@
 package com.reservas.juegos.service;
 
-import com.reservas.juegos.entities.Usuario;
 import com.reservas.juegos.dto.UsuarioDTO;
+import com.reservas.juegos.entities.Usuario;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ public class UsuarioService {
     private final List<Usuario> usuarios = new ArrayList<>();
     private static Long contador = 1L;
 
-    public Usuario registrarUsuario(UsuarioDTO dto) {
+    public Usuario crearUsuario(UsuarioDTO dto) {
         Usuario usuario = new Usuario(contador++, dto.getNombre(), dto.getCorreo());
         usuarios.add(usuario);
         return usuario;
@@ -23,6 +23,9 @@ public class UsuarioService {
     }
 
     public Usuario obtenerUsuario(Long id) {
-        return usuarios.stream().filter(u -> u.getId().equals(id)).findFirst().orElse(null);
+        return usuarios.stream()
+                .filter(u -> u.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 }

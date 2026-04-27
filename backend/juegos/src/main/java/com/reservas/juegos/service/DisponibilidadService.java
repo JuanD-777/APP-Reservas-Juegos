@@ -8,10 +8,8 @@ import java.util.List;
 
 @Service
 public class DisponibilidadService {
-
     private final List<Producto> productos = new ArrayList<>();
 
-    // Simulación: agregar productos en memoria
     public void agregarProducto(Producto producto) {
         productos.add(producto);
     }
@@ -24,7 +22,14 @@ public class DisponibilidadService {
                 .orElse(false);
     }
 
-    public List<Producto> listarProductos() {
-        return productos;
+    public boolean cambiarDisponibilidad(Long id, boolean disponible) {
+        return productos.stream()
+                .filter(p -> p.getId().equals(id))
+                .findFirst()
+                .map(p -> {
+                    p.setDisponible(disponible);
+                    return true;
+                })
+                .orElse(false);
     }
 }

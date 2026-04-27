@@ -8,14 +8,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class BusquedaService {
-    private final List<Producto> productos;
+    private final ProductoService productoService;
 
-    public BusquedaService(List<Producto> productos) {
-        this.productos = productos;
+    public BusquedaService(ProductoService productoService) {
+        this.productoService = productoService;
     }
 
     public List<Producto> buscarPorNombre(String nombre) {
-        return productos.stream()
+        return productoService.listarProductos().stream()
                 .filter(p -> p.getNombre().toLowerCase().contains(nombre.toLowerCase()))
                 .collect(Collectors.toList());
     }

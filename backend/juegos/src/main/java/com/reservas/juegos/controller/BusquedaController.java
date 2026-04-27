@@ -1,7 +1,7 @@
 package com.reservas.juegos.controller;
 
-import com.reservas.juegos.entities.Producto;
 import com.reservas.juegos.service.BusquedaService;
+import com.reservas.juegos.entities.Producto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

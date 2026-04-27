@@ -17,7 +17,6 @@ public class ReservaController {
         this.reservaService = reservaService;
     }
 
-    // Crear una reserva (con usuario, producto y fecha)
     @PostMapping("/crear")
     public ResponseEntity<?> crear(@RequestBody ReservaDTO dto) {
         try {
@@ -28,13 +27,11 @@ public class ReservaController {
         }
     }
 
-    // Listar todas las reservas
     @GetMapping
     public ResponseEntity<List<Reserva>> listar() {
         return ResponseEntity.ok(reservaService.listarReservas());
     }
 
-    // Obtener una reserva por ID
     @GetMapping("/{id}")
     public ResponseEntity<Reserva> obtener(@PathVariable Long id) {
         Reserva reserva = reservaService.obtenerReserva(id);
