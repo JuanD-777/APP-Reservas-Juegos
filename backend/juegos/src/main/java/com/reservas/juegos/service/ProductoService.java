@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;       // 👈 necesario para Map.of()
 import java.util.Optional;
 
 @Service
@@ -22,6 +23,7 @@ public class ProductoService {
     @Autowired
     private CategoriaRepository categoriaRepository;
 
+    // Listar todos los productos
     public List<Producto> listarTodos() {
         return productoRepository.findAll();
     }
@@ -32,14 +34,20 @@ public class ProductoService {
         return productoRepository.findAll(pageable);
     }
 
+    // Buscar producto por ID
     public Optional<Producto> buscarPorId(Long id) {
         return productoRepository.findById(id);
     }
 
+    // Crear producto con validación básica
     public Producto crear(Producto producto) {
+        if (producto.getTitulo() == null || producto.getTitulo().isBlank()) {
+            throw new IllegalArgumentException("El título del producto es obligatorio");
+        }
         return productoRepository.save(producto);
     }
 
+    // Actualizar producto
     public Optional<Producto> actualizar(Long id, Producto datos) {
         return productoRepository.findById(id).map(p -> {
             p.setTitulo(datos.getTitulo());
@@ -54,6 +62,7 @@ public class ProductoService {
         });
     }
 
+    // Eliminar producto
     public boolean eliminar(Long id) {
         if (!productoRepository.existsById(id)) {
             return false;
@@ -62,7 +71,7 @@ public class ProductoService {
         return true;
     }
 
-    // #12 Categorizar producto: asigna una categoría a un producto
+    // Asignar categoría a producto
     public Optional<Producto> asignarCategoria(Long productoId, Long categoriaId) {
         Optional<Producto> productoOpt = productoRepository.findById(productoId);
         Optional<Categoria> categoriaOpt = categoriaRepository.findById(categoriaId);
@@ -81,30 +90,32 @@ public class ProductoService {
         return Optional.of(producto);
     }
 
+    // Quitar categoría de producto
     public Optional<Producto> quitarCategoria(Long productoId, Long categoriaId) {
         return productoRepository.findById(productoId).map(p -> {
             p.getCategorias().removeIf(c -> c.getId().equals(categoriaId));
             return productoRepository.save(p);
         });
     }
-    // Ver políticas del producto
+
+    // Obtener políticas del producto
     public Optional<String> obtenerPoliticas(Long id) {
         return productoRepository.findById(id)
                 .map(Producto::getPoliticas);
     }
 
-    // Compartir producto: devuelve datos listos para compartir en redes
+    // Datos listos para compartir
     public Optional<Map<String, String>> obtenerDatosCompartir(Long id) {
         return productoRepository.findById(id).map(p -> Map.of(
-                "titulo",    p.getTitulo(),
-                "precio",    String.valueOf(p.getPrecio()),
+                "titulo",     p.getTitulo(),
+                "precio",     String.valueOf(p.getPrecio()),
                 "plataforma", p.getPlataforma() != null ? p.getPlataforma() : "",
-                "imagenUrl", p.getImagenUrl() != null ? p.getImagenUrl() : "",
-                "link",      "https://juegos.app/producto/" + p.getId()
+                "imagenUrl",  p.getImagenUrl() != null ? p.getImagenUrl() : "",
+                "link",       "https://juegos.app/producto/" + p.getId()
         ));
     }
 
-    // Puntua el producto (acumula votos y recalcula promedio)
+    // Puntuar producto
     public Optional<Producto> puntuar(Long id, double puntuacion) {
         if (puntuacion < 1 || puntuacion > 5) return Optional.empty();
 
@@ -112,10 +123,8 @@ public class ProductoService {
             p.setTotalVotos(p.getTotalVotos() + 1);
             p.setSumaRatings(p.getSumaRatings() + puntuacion);
             double promedio = p.getSumaRatings() / p.getTotalVotos();
-            // Redondear a 1 decimal
             p.setRating(Math.round(promedio * 10.0) / 10.0);
             return productoRepository.save(p);
         });
     }
-
 }

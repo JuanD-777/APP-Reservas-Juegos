@@ -6,6 +6,7 @@ import com.reservas.juegos.repository.ProductoRepository;
 import com.reservas.juegos.repository.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.reservas.juegos.factory.ReservaFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +54,7 @@ public class ReservaService {
         producto.setStock(producto.getStock() - 1);
         productoRepository.save(producto);
 
-        Reserva reserva = new Reserva(
+        Reserva reserva = ReservaFactory.crearReservaConFecha(
                 dto.getNombreCliente(),
                 dto.getEmailCliente(),
                 producto,

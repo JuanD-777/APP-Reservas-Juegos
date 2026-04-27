@@ -98,4 +98,16 @@ public class Producto {
 
     public List<Categoria> getCategorias() { return categorias; }
     public void setCategorias(List<Categoria> categorias) { this.categorias = categorias; }
+
+    public String getPoliticas() { return politicas; }
+    public void setPoliticas(String politicas) { this.politicas = politicas; }
+
+    public String getImagenUrl() { return imagenUrl; }
+    public void setImagenUrl(String imagenUrl) { this.imagenUrl = imagenUrl; }
+
+    public int getTotalVotos() { return totalVotos; }
+    public void setTotalVotos(int totalVotos) { this.totalVotos = totalVotos; }
+
+    public double getSumaRatings() { return sumaRatings; }
+    public void setSumaRatings(double sumaRatings) { this.sumaRatings = sumaRatings; }
 }

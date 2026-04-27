@@ -1,0 +1,16 @@
+package com.reservas.juegos.dto;
+
+public class FavoritoDTO {
+    private Long usuarioId;
+    private Long productoId;
+
+    public FavoritoDTO() {}
+
+    public FavoritoDTO(Long usuarioId, Long productoId) {
+        this.usuarioId = usuarioId;
+        this.productoId = productoId;
+    }
+
+    public Long getUsuarioId() { return usuarioId; }
+    public Long getProductoId() { return productoId; }
+}

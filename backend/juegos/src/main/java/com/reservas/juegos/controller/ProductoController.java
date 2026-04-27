@@ -82,30 +82,21 @@ public class ProductoController {
                 : ResponseEntity.notFound().build();
     }
 
-    // #11 eliminar producto
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        return productoService.eliminar(id)
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
-    }
-
-
     // #12 Categorizar producto
     @PostMapping("/{id}/categorias/{categoriaId}")
     public ResponseEntity<Producto> asignarCategoria(
-            @PathVariable Long id,
+            @PathVariable("id") Long productoId,
             @PathVariable Long categoriaId) {
-        return productoService.asignarCategoria(id, categoriaId)
+        return productoService.asignarCategoria(productoId, categoriaId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}/categorias/{categoriaId}")
     public ResponseEntity<Producto> quitarCategoria(
-            @PathVariable Long id,
+            @PathVariable("id") Long productoId,
             @PathVariable Long categoriaId) {
-        return productoService.quitarCategoria(id, categoriaId)
+        return productoService.quitarCategoria(productoId, categoriaId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

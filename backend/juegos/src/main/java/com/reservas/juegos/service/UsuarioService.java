@@ -43,4 +43,14 @@ public class UsuarioService {
     public Optional<Usuario> buscarPorEmail(String email) {
         return usuarioRepository.findByEmail(email);
     }
+
+    // Listar todos los usuarios
+    public java.util.List<Usuario> listarUsuarios() {
+        return usuarioRepository.findAll();
+    }
+
+    // Obtener usuario por id (retorna null si no existe - usado por controlador)
+    public Usuario obtenerUsuario(Long id) {
+        return usuarioRepository.findById(id).orElse(null);
+    }
 }
