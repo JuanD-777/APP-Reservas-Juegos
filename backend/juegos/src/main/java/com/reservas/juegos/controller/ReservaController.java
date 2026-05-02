@@ -33,7 +33,14 @@ public class ReservaController {
     private ReservaService reservaService;
 
     @GetMapping
-    public ResponseEntity<List<Reserva>> listarTodas() {
+    public ResponseEntity<List<Reserva>> listarTodas(@RequestParam(required = false) String tipoFecha) {
+        if (tipoFecha != null) {
+            if ("sin".equalsIgnoreCase(tipoFecha)) {
+                return ResponseEntity.ok(reservaService.listarSinFecha());
+            } else if ("con".equalsIgnoreCase(tipoFecha)) {
+                return ResponseEntity.ok(reservaService.listarConFecha());
+            }
+        }
         return ResponseEntity.ok(reservaService.listarTodas());
     }
 
@@ -95,5 +102,13 @@ public class ReservaController {
         return reservaService.eliminar(id)
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/por-fecha")
+    public ResponseEntity<java.util.Map<String, java.util.List<Reserva>>> listarPorFecha() {
+        java.util.Map<String, java.util.List<Reserva>> res = new java.util.HashMap<>();
+        res.put("conFecha", reservaService.listarConFecha());
+        res.put("sinFecha", reservaService.listarSinFecha());
+        return ResponseEntity.ok(res);
     }
 }

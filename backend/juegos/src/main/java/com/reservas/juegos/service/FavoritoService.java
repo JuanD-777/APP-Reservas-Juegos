@@ -4,7 +4,9 @@ import com.reservas.juegos.dto.FavoritoDTO;
 import com.reservas.juegos.entities.Favorito;
 import com.reservas.juegos.entities.Usuario;
 import com.reservas.juegos.entities.Producto;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,7 @@ public class FavoritoService {
         Producto producto = productoService.buscarPorId(dto.getProductoId()).orElse(null);
 
         if (usuario == null || producto == null) {
-            throw new IllegalArgumentException("Usuario o producto no encontrado");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario o producto no encontrado");
         }
 
         Favorito favorito = new Favorito(contador++, usuario, producto);

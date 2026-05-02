@@ -24,6 +24,14 @@ public class ReservaService {
         return reservaRepository.findAll();
     }
 
+    public List<Reserva> listarSinFecha() {
+        return reservaRepository.findByFechaDevolucionIsNull();
+    }
+
+    public List<Reserva> listarConFecha() {
+        return reservaRepository.findByFechaDevolucionIsNotNull();
+    }
+
     public Optional<Reserva> buscarPorId(Long id) {
         return reservaRepository.findById(id);
     }

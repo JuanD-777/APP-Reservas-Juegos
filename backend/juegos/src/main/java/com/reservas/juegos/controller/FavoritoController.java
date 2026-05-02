@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/favoritos")
+@CrossOrigin(origins = "*")
 public class FavoritoController {
     private final FavoritoService favoritoService;
 
