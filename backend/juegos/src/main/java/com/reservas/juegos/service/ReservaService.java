@@ -15,6 +15,12 @@ import java.util.Optional;
 public class ReservaService {
 
     @Autowired
+    private com.reservas.juegos.strategy.ReservaNormalStrategy normal;
+
+    @Autowired
+    private com.reservas.juegos.strategy.ReservaPremiumStrategy premium;
+
+    @Autowired
     private ReservaRepository reservaRepository;
 
     @Autowired
@@ -62,13 +68,13 @@ public class ReservaService {
         producto.setStock(producto.getStock() - 1);
         productoRepository.save(producto);
 
-        Reserva reserva = ReservaFactory.crearReservaConFecha(
-                dto.getNombreCliente(),
-                dto.getEmailCliente(),
-                producto,
-                dto.getFechaReserva(),
-                dto.getFechaDevolucion()
-        );
+        Reserva reserva;
+
+        if ("PREMIUM".equalsIgnoreCase(dto.getTipo())) {
+            reserva = premium.crear(dto, producto);
+        } else {
+            reserva = normal.crear(dto, producto);
+        }
 
         return Optional.of(reservaRepository.save(reserva));
     }
