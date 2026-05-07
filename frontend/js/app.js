@@ -199,12 +199,21 @@ if (document.getElementById("galleryMain")) {
 //  4. ADMIN PANEL (solo si existe #tableBody)
 // ════════════════════════════════════════════════════════════
 if (document.getElementById("tableBody")) {
-  // Copia local para poder agregar/editar/eliminar sin afectar el array original
-  let products = [...juegos];
-  let filteredProds = [...products];
+  let products = [];           // se llena desde el backend
+  let filteredProds = [];
   let currentPage = 1;
   const perPage = 8;
   let deleteIndex = -1;
+
+  async function cargarProductos() {
+    try {
+      products = await ProductoAPI.listar();
+      filteredProds = [...products];
+      renderTable();
+    } catch (e) {
+      showToast("danger", "❌", "No se pudo conectar al backend: " + e.message);
+    }
+  }
 
   function renderTable() {
     const start = (currentPage - 1) * perPage;
