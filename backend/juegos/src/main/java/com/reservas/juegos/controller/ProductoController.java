@@ -94,14 +94,12 @@ public class ProductoController {
     }
 
     // ── DELETE /api/productos/{id} ──────────────────────────────────────────────
-    // Devuelve 200 + mensaje (en vez de 204 sin body, para que Postman muestre respuesta)
+    // Devuelve 204 No Content si se eliminó, 404 si no existe
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> eliminar(@PathVariable Long id) {
-        if (productoService.eliminar(id)) {
-            return ResponseEntity.ok(Map.of("mensaje", "Producto eliminado correctamente"));
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("error", "Producto no encontrado con id: " + id));
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        return productoService.eliminar(id)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 
     // ── POST /api/productos/{id}/categorias/{categoriaId} ──────────────────────
