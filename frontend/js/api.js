@@ -29,6 +29,7 @@ const ProductoAPI = {
   crear:    (data)      => apiFetch("/productos",      { method: "POST",   body: JSON.stringify(data) }),
   actualizar:(id, data) => apiFetch(`/productos/${id}`,{ method: "PUT",    body: JSON.stringify(data) }),
   eliminar: (id)        => apiFetch(`/productos/${id}`,{ method: "DELETE" }),
+  importar:  (data)      => apiFetch("/productos/importarRawg",  { method: "POST",   body: JSON.stringify(data) }),
 };
 
 // ── Categorías ────────────────────────────────────────────────
@@ -51,3 +52,15 @@ const CaracteristicaAPI = {
   eliminar:  (id)        => apiFetch(`/caracteristicas/${id}`,{ method: "DELETE" }),
 };
 
+// ── Autenticación ─────────────────────────────────────────────
+// Campos de respuesta: id, email, nombre, rol
+const AuthAPI = {
+  registro: (data) =>
+    apiFetch("/auth/registro", { method: "POST", body: JSON.stringify(data) }),
+
+  login: (data) =>
+    apiFetch("/auth/login", { method: "POST", body: JSON.stringify(data) }),
+
+  logout: () =>
+    apiFetch("/auth/logout", { method: "POST" }),
+};

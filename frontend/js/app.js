@@ -82,68 +82,76 @@ if (document.getElementById("gamesGrid")) {
     renderGames();
   };
 
-  function renderGames() {
-    const start = (currentPage - 1) * perPage;
-    const slice = filteredGames.slice(start, start + perPage);
-    const totalPages = Math.ceil(filteredGames.length / perPage);
-    const grid = document.getElementById("gamesGrid");
+    function renderGames() {
+      const start = (currentPage - 1) * perPage;
+      const slice = filteredGames.slice(start, start + perPage);
+      const totalPages = Math.ceil(filteredGames.length / perPage);
+      const grid = document.getElementById("gamesGrid");
 
-    document.getElementById("resultCount").textContent =
-      `Mostrando ${filteredGames.length} juego${filteredGames.length !== 1 ? "s" : ""}`;
-    document.getElementById("pageIndicator").textContent =
-      `Página ${currentPage} de ${totalPages || 1}`;
+      document.getElementById("resultCount").textContent =
+        `Mostrando ${filteredGames.length} juego${filteredGames.length !== 1 ? "s" : ""}`;
+      document.getElementById("pageIndicator").textContent =
+        `Página ${currentPage} de ${totalPages || 1}`;
 
-    grid.innerHTML =
-      slice.length === 0
-        ? `<div class="col-12 catalog-empty"><p>No se encontraron juegos con ese filtro.</p></div>`
-        : slice
-            .map(
-              (g) => `
-          <div class="col-lg-3 col-md-4 col-sm-6">
-            <div class="game-card">
-              <a href="product-detail.html" class="catalog-card-link">
-                <div class="game-thumbnail ${g.bg}">
-                  <div class="game-tags">
-                    <span class="game-tag">${g.genre}</span>
-                    ${g.tag ? `<span class="${g.tagClass}">+ ${g.tag}</span>` : ""}
+      grid.innerHTML =
+        slice.length === 0
+          ? `<div class="col-12 catalog-empty"><p>No se encontraron juegos con ese filtro.</p></div>`
+          : slice
+              .map(
+                (g) => `
+            <div class="col-lg-3 col-md-4 col-sm-6">
+              <div class="game-card">
+                <a href="product-detail.html" class="catalog-card-link">
+                  <div class="game-thumbnail ${g.bg}">
+                    <div class="game-tags">
+                      <span class="game-tag">${g.genre}</span>
+                      ${g.stock === 0 ? `<span class="game-tag-top">AGOTADO</span>` : ""}
+                    </div>
+                    ${
+                      g.imagenUrl
+                        ? `<img class="game-cover" src="${g.imagenUrl}" alt="${g.title}" />`
+                        : `<span style="font-size:3rem">${g.emoji}</span>`
+                    }
                   </div>
-                  ${g.emoji}
+                </a>
+                <div class="game-card-info">
+                  <div class="game-platform">${g.platform}</div>
+                  <h3 class="game-title-catalog">${g.title}</h3>
+                  <div class="game-bottom">
+                    <div class="game-price">$${g.price.toLocaleString("es-CO")}<span>/día</span></div>
+                    <div><span class="game-stars">★★★★★</span><span class="game-rating">${g.rating}</span></div>
+                  </div>
+                  <a href="product-detail.html"
+                     class="catalog-btn-ver ${g.stock === 0 ? "disabled" : ""}"
+                     ${g.stock === 0 ? 'style="pointer-events:none;opacity:0.5"' : ""}>
+                    ${g.stock === 0 ? "Agotado" : "Ver detalles →"}
+                  </a>
                 </div>
-              </a>
-              <div class="game-card-info">
-                <div class="game-platform">${g.platform}</div>
-                <h3 class="game-title-catalog">${g.title}</h3>
-                <div class="game-bottom">
-                  <div class="game-price">$${g.price.toLocaleString("es-CO")}<span>/día</span></div>
-                  <div><span class="game-stars">★★★★★</span><span class="game-rating">${g.rating}</span></div>
-                </div>
-                <a href="product-detail.html" class="catalog-btn-ver">Ver detalles →</a>
               </div>
             </div>
-          </div>
-        `,
-            )
-            .join("");
+          `,
+              )
+              .join("");
 
-    // Paginación Bootstrap
-    const pag = document.getElementById("pagination");
-    pag.innerHTML = `
-      <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
-        <a class="page-link" href="#catalogo" onclick="goPage(${currentPage - 1})">←</a>
-      </li>`;
+      // Paginación Bootstrap
+      const pag = document.getElementById("pagination");
+      pag.innerHTML = `
+        <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
+          <a class="page-link" href="#catalogo" onclick="goPage(${currentPage - 1})">←</a>
+        </li>`;
 
-    for (let i = 1; i <= totalPages; i++) {
+      for (let i = 1; i <= totalPages; i++) {
+        pag.innerHTML += `
+          <li class="page-item ${i === currentPage ? "active" : ""}">
+            <a class="page-link" href="#catalogo" onclick="goPage(${i})">${i}</a>
+          </li>`;
+      }
+
       pag.innerHTML += `
-        <li class="page-item ${i === currentPage ? "active" : ""}">
-          <a class="page-link" href="#catalogo" onclick="goPage(${i})">${i}</a>
+        <li class="page-item ${currentPage >= totalPages ? "disabled" : ""}">
+          <a class="page-link" href="#catalogo" onclick="goPage(${currentPage + 1})">→</a>
         </li>`;
     }
-
-    pag.innerHTML += `
-      <li class="page-item ${currentPage >= totalPages ? "disabled" : ""}">
-        <a class="page-link" href="#catalogo" onclick="goPage(${currentPage + 1})">→</a>
-      </li>`;
-  }
 
   window.goPage = function (n) {
     const totalPages = Math.ceil(filteredGames.length / perPage);
@@ -422,76 +430,91 @@ if (document.getElementById("tableBody")) {
 }
 
 // ==========================================
-// 1. REGISTRO DE USUARIO
+// 1. REGISTRO DE USUARIO — llama al backend
 // ==========================================
 const registerForm = document.getElementById("registerForm");
 if (registerForm) {
-  registerForm.addEventListener("submit", function (e) {
+  registerForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    // Creamos el objeto con los datos del formulario
-    const nuevoUsuario = {
-      nombre: document.getElementById("regNombre").value.trim(),
-      apellido: document.getElementById("regApellido").value.trim(),
-      email: document.getElementById("regEmail").value.trim(),
-      password: document.getElementById("regPassword").value.trim(),
-    };
+    const nombre   = document.getElementById("regNombre").value.trim();
+    const apellido = document.getElementById("regApellido").value.trim();
+    const email    = document.getElementById("regEmail").value.trim();
+    const password = document.getElementById("regPassword").value.trim();
 
-    // Guardamos en el "disco duro" del navegador
-    localStorage.setItem("usuarioRegistrado", JSON.stringify(nuevoUsuario));
+    const errorMsg   = document.getElementById("registerError");
+    const successMsg = document.getElementById("successMessage");
 
-    // Mostrar mensaje de éxito y limpiar
-    document.getElementById("successMessage").classList.remove("d-none");
-    registerForm.reset();
+    try {
+      await AuthAPI.registro({ nombre: nombre + " " + apellido, email, password });
 
-    setTimeout(() => {
-      const modal = bootstrap.Modal.getInstance(
-        document.getElementById("registerModal"),
-      );
-      modal.hide();
-      document.getElementById("successMessage").classList.add("d-none");
-    }, 2000);
+      // Registro exitoso: mostrar mensaje y cerrar modal
+      if (successMsg) successMsg.classList.remove("d-none");
+      registerForm.reset();
+
+      setTimeout(() => {
+        const modal = bootstrap.Modal.getInstance(
+          document.getElementById("registerModal")
+        );
+        modal.hide();
+        if (successMsg) successMsg.classList.add("d-none");
+      }, 2000);
+
+    } catch (err) {
+      // El backend lanza "Email ya existe" cuando el correo está duplicado
+      if (errorMsg) {
+        errorMsg.textContent =
+          err.message.includes("ya existe")
+            ? "Este correo ya está registrado."
+            : "Error al registrar. Intenta de nuevo.";
+        errorMsg.classList.remove("d-none");
+      }
+    }
   });
 }
 
 // ==========================================
-// 2. LOGIN DE USUARIO
+// 2. LOGIN DE USUARIO — llama al backend
 // ==========================================
 const loginForm = document.getElementById("loginForm");
 if (loginForm) {
-  loginForm.addEventListener("submit", function (e) {
+  loginForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    const emailInput = document.getElementById("loginEmail").value.trim();
-    const passInput = document.getElementById("loginPassword").value.trim();
+    const email    = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
     const errorMsg = document.getElementById("loginError");
 
-    // Traemos al usuario que se registró antes
-    const usuarioGuardado = JSON.parse(
-      localStorage.getItem("usuarioRegistrado"),
-    );
+    try {
+      const usuario = await AuthAPI.login({ email, password });
 
-    if (
-      usuarioGuardado &&
-      emailInput === usuarioGuardado.email &&
-      passInput === usuarioGuardado.password
-    ) {
-      localStorage.setItem("usuarioActivo", JSON.stringify(usuarioGuardado));
+      // Guardamos solo datos no sensibles en sessionStorage
+      sessionStorage.setItem("usuarioActivo", JSON.stringify({
+        id:      usuario.id,
+        nombre:  usuario.nombre,
+        email:   usuario.email,
+        rol:     usuario.rol,
+      }));
 
-      // Cerramos el modal
       const modal = bootstrap.Modal.getInstance(
-        document.getElementById("loginModal"),
+        document.getElementById("loginModal")
       );
       modal.hide();
       loginForm.reset();
-      errorMsg.classList.add("d-none");
+      if (errorMsg) errorMsg.classList.add("d-none");
 
-      // ¡IMPORTANTE! se llama a la funcion para cambiar la interfaz
       actualizarInterfaz();
-    } else {
-      // ERROR
-      errorMsg.textContent = "Datos incorrectos o usuario no registrado.";
-      errorMsg.classList.remove("d-none");
+
+      // Si es admin, redirigir al panel
+      if (usuario.rol === "ADMIN") {
+        window.location.href = "admin.html";
+      }
+
+    } catch (err) {
+      if (errorMsg) {
+        errorMsg.textContent = "Correo o contraseña incorrectos.";
+        errorMsg.classList.remove("d-none");
+      }
     }
   });
 }
@@ -500,32 +523,27 @@ if (loginForm) {
 // 3. CAMBIO DE LOS BOTONES POR EL PERFIL
 // ==========================================
 function actualizarInterfaz() {
-  const sesion = JSON.parse(localStorage.getItem("usuarioActivo"));
+  const sesion = JSON.parse(sessionStorage.getItem("usuarioActivo"));
 
-  const botonesAuth = document.getElementById("navAuthButtons");
+  const botonesAuth  = document.getElementById("navAuthButtons");
   const perfilUsuario = document.getElementById("navUserProfile");
-  const nombreTxt = document.getElementById("userNameDisplay");
+  const nombreTxt    = document.getElementById("userNameDisplay");
   const avatarCirculo = document.getElementById("userAvatarInitials");
 
   if (sesion) {
-    // una vez logueado se esconden los botones
-    if (botonesAuth) botonesAuth.classList.add("d-none"); // se esconde el Login/Registro
-    if (perfilUsuario) perfilUsuario.classList.remove("d-none"); // Mostramos Perfil
+    if (botonesAuth)   botonesAuth.classList.add("d-none");
+    if (perfilUsuario) perfilUsuario.classList.remove("d-none");
 
-    // Ponemos el nombre
     if (nombreTxt) nombreTxt.textContent = sesion.nombre;
 
-    // Creamos las iniciales (Ej: Juan Perez -> JP)
     if (avatarCirculo) {
-      const inicialN = sesion.nombre.charAt(0).toUpperCase();
-      const inicialA = sesion.apellido
-        ? sesion.apellido.charAt(0).toUpperCase()
-        : "";
-      avatarCirculo.textContent = inicialN + inicialA;
+      const partes = sesion.nombre.split(" ");
+      const iniciales =
+        (partes[0]?.charAt(0) ?? "") + (partes[1]?.charAt(0) ?? "");
+      avatarCirculo.textContent = iniciales.toUpperCase();
     }
   } else {
-    // Si no hay sesión (Cerró sesión o nunca entró)
-    if (botonesAuth) botonesAuth.classList.remove("d-none");
+    if (botonesAuth)   botonesAuth.classList.remove("d-none");
     if (perfilUsuario) perfilUsuario.classList.add("d-none");
   }
 }
@@ -533,12 +551,17 @@ function actualizarInterfaz() {
 // ==========================================
 // 4. CERRAR SESIÓN
 // ==========================================
-window.cerrarSesion = function () {
-  localStorage.removeItem("usuarioActivo");
+window.cerrarSesion = async function () {
+  try {
+    await AuthAPI.logout();
+  } catch (_) {
+    // El backend solo responde con un mensaje, no importa si falla
+  }
+  sessionStorage.removeItem("usuarioActivo");
   actualizarInterfaz();
 };
 
-// Al cargar la página, verificamos si ya había una sesión iniciada
+// Al cargar la página, verificar si ya hay sesión
 document.addEventListener("DOMContentLoaded", actualizarInterfaz);
 
 /* ACTIVAR SELECCIÓN DE CATEGORÍAS */
