@@ -51,3 +51,15 @@ const CaracteristicaAPI = {
   eliminar:  (id)        => apiFetch(`/caracteristicas/${id}`,{ method: "DELETE" }),
 };
 
+// ── Autenticación ─────────────────────────────────────────────
+// Campos de respuesta: id, email, nombre, rol
+const AuthAPI = {
+  registro: (data) =>
+    apiFetch("/auth/registro", { method: "POST", body: JSON.stringify(data) }),
+
+  login: (data) =>
+    apiFetch("/auth/login", { method: "POST", body: JSON.stringify(data) }),
+
+  logout: () =>
+    apiFetch("/auth/logout", { method: "POST" }),
+};
