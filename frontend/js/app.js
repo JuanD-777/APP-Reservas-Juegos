@@ -72,11 +72,11 @@ if (document.getElementById("gamesGrid")) {
     filteredGames = juegos.filter(
       (g) =>
         (!q ||
-          g.title.toLowerCase().includes(q) ||
-          g.genre.toLowerCase().includes(q) ||
-          g.platform.toLowerCase().includes(q)) &&
-        (!activeGenre || g.genre === activeGenre) &&
-        (!activePlatform || g.platform === activePlatform),
+          (g.titulo || "").toLowerCase().includes(q) ||
+          (g.genero || "").toLowerCase().includes(q) ||
+          (g.plataforma || "").toLowerCase().includes(q)) &&
+        (!activeGenre || g.genero === activeGenre) &&
+        (!activePlatform || g.plataforma === activePlatform),
     );
     currentPage = 1;
     renderGames();
@@ -104,21 +104,21 @@ if (document.getElementById("gamesGrid")) {
                 <a href="product-detail.html" class="catalog-card-link">
                   <div class="game-thumbnail ${g.bg}">
                     <div class="game-tags">
-                      <span class="game-tag">${g.genre}</span>
+                      <span class="game-tag">${g.genero || "Accion"}</span>
                       ${g.stock === 0 ? `<span class="game-tag-top">AGOTADO</span>` : ""}
                     </div>
                     ${
                       g.imagenUrl
-                        ? `<img class="game-cover" src="${g.imagenUrl}" alt="${g.title}" />`
+                        ? `<img class="game-cover" src="${g.imagenUrl}" alt="${g.titulo}" />`
                         : `<span style="font-size:3rem">${g.emoji}</span>`
                     }
                   </div>
                 </a>
                 <div class="game-card-info">
-                  <div class="game-platform">${g.platform}</div>
-                  <h3 class="game-title-catalog">${g.title}</h3>
+                  <div class="game-platform">${g.plataforma || "PC"}</div>
+                  <h3 class="game-title-catalog">${g.titulo}</h3>
                   <div class="game-bottom">
-                    <div class="game-price">$${g.price.toLocaleString("es-CO")}<span>/día</span></div>
+                    <div class="game-price">$${Number(g.precio || 0).toLocaleString("es-CO")}<span>/día</span></div>
                     <div><span class="game-stars">★★★★★</span><span class="game-rating">${g.rating}</span></div>
                   </div>
                   <a href="product-detail.html"
@@ -212,10 +212,30 @@ if (document.getElementById("tableBody")) {
   let currentPage = 1;
   const perPage = 8;
   let deleteIndex = -1;
+  const bgPorPlataformaAdmin = {
+    PS5: "game-thumb-purple",
+    Xbox: "game-thumb-red",
+    Switch: "game-thumb-green",
+    PC: "game-thumb-blue",
+  };
+
+  function obtenerListaProductos(respuesta) {
+    if (Array.isArray(respuesta)) return respuesta;
+    return respuesta?.contenido || [];
+  }
+
+  function estadoNormalizado(estado) {
+    return (estado || "disponible").toString().toLowerCase();
+  }
+
+  function estadoCapitalizado(estado) {
+    const valor = estadoNormalizado(estado);
+    return valor.charAt(0).toUpperCase() + valor.slice(1);
+  }
 
   window.cargarProductos = async function () {
     try {
-      products = await ProductoAPI.listar();
+      products = obtenerListaProductos(await ProductoAPI.listar());
       filteredProds = [...products];
       renderTable();
     } catch (e) {
@@ -235,18 +255,20 @@ if (document.getElementById("tableBody")) {
         <tr>
           <td>
             <div class="tbl-game-info">
-              <div class="tbl-thumb ${p.bg}">${p.emoji}</div>
+              <div class="tbl-thumb ${bgPorPlataformaAdmin[p.plataforma] || "game-thumb-purple"}">
+                ${p.imagenUrl ? `<img class="tbl-cover" src="${p.imagenUrl}" alt="${p.titulo}" />` : p.emoji || "🎮"}
+              </div>
               <div>
-                <div class="tbl-game-name">${p.title}</div>
+                <div class="tbl-game-name">${p.titulo}</div>
                 <div class="tbl-game-id">${p.id}</div>
               </div>
             </div>
           </td>
-          <td><span class="platform-tbl">${p.platform}</span></td>
-          <td>${p.genre}</td>
-          <td class="tbl-price">$${p.price.toLocaleString("es-CO")}</td>
-          <td><span class="tbl-stars">${"★".repeat(Math.floor(p.rating))}</span> <span class="tbl-rating-num">${p.rating}</span></td>
-          <td><span class="status-badge ${p.status}">${p.status.charAt(0).toUpperCase() + p.status.slice(1)}</span></td>
+          <td><span class="platform-tbl">${p.plataforma || ""}</span></td>
+          <td>${p.genero || ""}</td>
+          <td class="tbl-price">$${Number(p.precio || 0).toLocaleString("es-CO")}</td>
+          <td><span class="tbl-stars">${"★".repeat(Math.floor(p.rating || 0))}</span> <span class="tbl-rating-num">${p.rating || 0}</span></td>
+          <td><span class="status-badge ${estadoNormalizado(p.estado)}">${estadoCapitalizado(p.estado)}</span></td>
           <td class="${p.stock === 0 ? "tbl-stock-out" : "tbl-stock"}">${p.stock}</td>
           <td>
             <div class="action-btns">
@@ -280,13 +302,13 @@ if (document.getElementById("tableBody")) {
     // Stats
     document.getElementById("totalCount").textContent = products.length;
     document.getElementById("availCount").textContent = products.filter(
-      (p) => p.status === "disponible",
+      (p) => estadoNormalizado(p.estado) === "disponible",
     ).length;
     document.getElementById("reservedCount").textContent = products.filter(
-      (p) => p.status === "reservado",
+      (p) => estadoNormalizado(p.estado) === "reservado",
     ).length;
     document.getElementById("outCount").textContent = products.filter(
-      (p) => p.status === "agotado",
+      (p) => estadoNormalizado(p.estado) === "agotado",
     ).length;
   }
 
@@ -297,10 +319,10 @@ if (document.getElementById("tableBody")) {
     filteredProds = products.filter(
       (p) =>
         (!q ||
-          p.title.toLowerCase().includes(q) ||
-          p.id.toLowerCase().includes(q)) &&
-        (!plt || p.platform === plt) &&
-        (!sts || p.status === sts),
+          (p.titulo || "").toLowerCase().includes(q) ||
+          String(p.id || "").toLowerCase().includes(q)) &&
+        (!plt || p.plataforma === plt) &&
+        (!sts || estadoNormalizado(p.estado) === sts),
     );
     currentPage = 1;
     renderTable();
@@ -332,43 +354,31 @@ if (document.getElementById("tableBody")) {
     const p = products[idx];
     document.getElementById("modalTitle").textContent = "✏️ Editar producto";
     document.getElementById("editIndex").value = idx;
-    document.getElementById("fTitle").value = p.title;
-    document.getElementById("fPrice").value = p.price;
+    document.getElementById("fTitle").value = p.titulo || "";
+    document.getElementById("fPrice").value = p.precio || "";
     document.getElementById("fStock").value = p.stock;
     document.getElementById("fRating").value = p.rating;
-    document.getElementById("fPlatform").value = p.platform;
-    document.getElementById("fGenre").value = p.genre;
-    document.getElementById("fStatus").value = p.status;
+    document.getElementById("fPlatform").value = p.plataforma || "PC";
+    document.getElementById("fGenre").value = p.genero || "RPG";
+    document.getElementById("fStatus").value = estadoNormalizado(p.estado);
     document.getElementById("fEmoji").value = p.emoji;
     new bootstrap.Modal(document.getElementById("productModal")).show();
   };
 
-  window.saveProduct = function () {
+  window.saveProduct = async function () {
     const idx = parseInt(document.getElementById("editIndex").value);
-    const title = document.getElementById("fTitle").value.trim();
-    const price = parseInt(document.getElementById("fPrice").value);
-    if (!title || !price) {
+    const titulo = document.getElementById("fTitle").value.trim();
+    const precio = parseInt(document.getElementById("fPrice").value);
+    if (!titulo || !precio) {
       showToast("danger", "⚠️", "Completa título y precio.");
       return;
     }
 
-    const bgMap = {
-      PS5: "game-thumb-purple",
-      Xbox: "game-thumb-red",
-      Switch: "game-thumb-green",
-      PC: "game-thumb-blue",
-    };
-    const platform = document.getElementById("fPlatform").value;
-
-    const prod = {
-      id:
-        idx >= 0
-          ? products[idx].id
-          : "PLY-" + String(products.length + 1).padStart(3, "0"),
-      title,
-      platform,
-      genre: document.getElementById("fGenre").value,
-      price,
+    const producto = {
+      titulo,
+      plataforma: document.getElementById("fPlatform").value,
+      genero: document.getElementById("fGenre").value,
+      precio,
       rating: parseFloat(document.getElementById("fRating").value) || 4.5,
       stock:
         document.getElementById("fStock").value !== ""
@@ -376,43 +386,48 @@ if (document.getElementById("tableBody")) {
           : idx >= 0
             ? products[idx].stock
             : 0,
-      status: document.getElementById("fStatus").value,
+      estado: document.getElementById("fStatus").value,
       emoji: document.getElementById("fEmoji").value,
-      bg: bgMap[platform] || "game-thumb-purple",
-      tag: "",
-      tagClass: "",
-      description: "",
+      imagenUrl: idx >= 0 ? products[idx].imagenUrl || "" : "",
+      politicas: idx >= 0 ? products[idx].politicas || "" : "",
     };
 
-    if (idx >= 0) {
-      products[idx] = prod;
-      showToast("success", "✅", "Producto actualizado.");
-    } else {
-      products.push(prod);
-      showToast("success", "✅", "Producto agregado.");
-    }
+    try {
+      if (idx >= 0) {
+        await ProductoAPI.actualizar(products[idx].id, producto);
+        showToast("success", "✅", "Producto actualizado.");
+      } else {
+        await ProductoAPI.crear(producto);
+        showToast("success", "✅", "Producto agregado.");
+      }
 
-    filteredProds = [...products];
-    filterTable();
-    bootstrap.Modal.getInstance(document.getElementById("productModal")).hide();
+      await cargarProductos();
+      bootstrap.Modal.getInstance(document.getElementById("productModal")).hide();
+    } catch (error) {
+      showToast("danger", "Error", "Error al guardar: " + error.message);
+    }
   };
 
   window.openDeleteModal = function (idx) {
     deleteIndex = idx;
     document.getElementById("deleteGameName").textContent =
-      '"' + products[idx].title + '"';
+      '"' + products[idx].titulo + '"';
     new bootstrap.Modal(document.getElementById("deleteModal")).show();
   };
 
-  window.confirmDelete = function () {
+  window.confirmDelete = async function () {
     if (deleteIndex < 0) return;
-    const name = products[deleteIndex].title;
-    products.splice(deleteIndex, 1);
-    deleteIndex = -1;
-    filteredProds = [...products];
-    filterTable();
-    bootstrap.Modal.getInstance(document.getElementById("deleteModal")).hide();
-    showToast("danger", "🗑️", `"${name}" eliminado.`);
+    const producto = products[deleteIndex];
+    const name = producto.titulo;
+    try {
+      await ProductoAPI.eliminar(producto.id);
+      deleteIndex = -1;
+      await cargarProductos();
+      bootstrap.Modal.getInstance(document.getElementById("deleteModal")).hide();
+      showToast("danger", "🗑️", `"${name}" eliminado.`);
+    } catch (error) {
+      showToast("danger", "Error", "Error al eliminar: " + error.message);
+    }
   };
 
   let toastTimer;
@@ -498,6 +513,7 @@ if (document.getElementById("tableBody")) {
     const plataforma = document.getElementById("importPlatform").value;
     const precio = parseInt(document.getElementById("importPrice").value);
     const stock = parseInt(document.getElementById("importStock").value);
+    const estado = document.getElementById("importStatus").value;
 
     if (!rawgId || !precio || !stock) {
       showToast("warning", "⚠️", "Completa todos los campos.");
@@ -511,36 +527,10 @@ if (document.getElementById("tableBody")) {
         precio,
         stock,
         plataforma,
+        estado,
       });
 
-      // Mapear campos del backend al formato del frontend
-      const bgMap = {
-        PS5: "game-thumb-purple",
-        Xbox: "game-thumb-red",
-        Switch: "game-thumb-green",
-        PC: "game-thumb-blue",
-      };
-
-      const productoMapeado = {
-        id: result.id,
-        title: result.titulo,
-        platform: result.plataforma,
-        genre: result.genero || "Acción",
-        price: result.precio,
-        rating: result.rating || 4.5,
-        stock: result.stock,
-        status: result.estado ? result.estado.toLowerCase() : "disponible",
-        emoji: result.emoji || "🎮",
-        bg: bgMap[result.plataforma] || "game-thumb-purple",
-        tag: "",
-        tagClass: "",
-        description: "",
-      };
-
-      // Agregar a la lista local
-      products.push(productoMapeado);
-      filteredProds = [...products];
-      filterTable();
+      await cargarProductos();
 
       bootstrap.Modal.getInstance(
         document.getElementById("importRawgModal"),
