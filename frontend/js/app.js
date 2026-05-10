@@ -82,23 +82,23 @@ if (document.getElementById("gamesGrid")) {
     renderGames();
   };
 
-    function renderGames() {
-      const start = (currentPage - 1) * perPage;
-      const slice = filteredGames.slice(start, start + perPage);
-      const totalPages = Math.ceil(filteredGames.length / perPage);
-      const grid = document.getElementById("gamesGrid");
+  function renderGames() {
+    const start = (currentPage - 1) * perPage;
+    const slice = filteredGames.slice(start, start + perPage);
+    const totalPages = Math.ceil(filteredGames.length / perPage);
+    const grid = document.getElementById("gamesGrid");
 
-      document.getElementById("resultCount").textContent =
-        `Mostrando ${filteredGames.length} juego${filteredGames.length !== 1 ? "s" : ""}`;
-      document.getElementById("pageIndicator").textContent =
-        `Página ${currentPage} de ${totalPages || 1}`;
+    document.getElementById("resultCount").textContent =
+      `Mostrando ${filteredGames.length} juego${filteredGames.length !== 1 ? "s" : ""}`;
+    document.getElementById("pageIndicator").textContent =
+      `Página ${currentPage} de ${totalPages || 1}`;
 
-      grid.innerHTML =
-        slice.length === 0
-          ? `<div class="col-12 catalog-empty"><p>No se encontraron juegos con ese filtro.</p></div>`
-          : slice
-              .map(
-                (g) => `
+    grid.innerHTML =
+      slice.length === 0
+        ? `<div class="col-12 catalog-empty"><p>No se encontraron juegos con ese filtro.</p></div>`
+        : slice
+            .map(
+              (g) => `
             <div class="col-lg-3 col-md-4 col-sm-6">
               <div class="game-card">
                 <a href="product-detail.html" class="catalog-card-link">
@@ -130,28 +130,28 @@ if (document.getElementById("gamesGrid")) {
               </div>
             </div>
           `,
-              )
-              .join("");
+            )
+            .join("");
 
-      // Paginación Bootstrap
-      const pag = document.getElementById("pagination");
-      pag.innerHTML = `
+    // Paginación Bootstrap
+    const pag = document.getElementById("pagination");
+    pag.innerHTML = `
         <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
           <a class="page-link" href="#catalogo" onclick="goPage(${currentPage - 1})">←</a>
         </li>`;
 
-      for (let i = 1; i <= totalPages; i++) {
-        pag.innerHTML += `
+    for (let i = 1; i <= totalPages; i++) {
+      pag.innerHTML += `
           <li class="page-item ${i === currentPage ? "active" : ""}">
             <a class="page-link" href="#catalogo" onclick="goPage(${i})">${i}</a>
           </li>`;
-      }
+    }
 
-      pag.innerHTML += `
+    pag.innerHTML += `
         <li class="page-item ${currentPage >= totalPages ? "disabled" : ""}">
           <a class="page-link" href="#catalogo" onclick="goPage(${currentPage + 1})">→</a>
         </li>`;
-    }
+  }
 
   window.goPage = function (n) {
     const totalPages = Math.ceil(filteredGames.length / perPage);
@@ -207,13 +207,13 @@ if (document.getElementById("galleryMain")) {
 //  4. ADMIN PANEL (solo si existe #tableBody)
 // ════════════════════════════════════════════════════════════
 if (document.getElementById("tableBody")) {
-  let products = [];           // se llena desde el backend
+  let products = []; // se llena desde el backend
   let filteredProds = [];
   let currentPage = 1;
   const perPage = 8;
   let deleteIndex = -1;
 
-  async function cargarProductos() {
+  window.cargarProductos = async function () {
     try {
       products = await ProductoAPI.listar();
       filteredProds = [...products];
@@ -221,7 +221,7 @@ if (document.getElementById("tableBody")) {
     } catch (e) {
       showToast("danger", "❌", "No se pudo conectar al backend: " + e.message);
     }
-  }
+  };
 
   function renderTable() {
     const start = (currentPage - 1) * perPage;
@@ -425,8 +425,134 @@ if (document.getElementById("tableBody")) {
     toastTimer = setTimeout(() => el.classList.remove("show"), 3000);
   }
 
+  // ── IMPORTAR DESDE RAWG ──────────────────────────────────
+  window.openImportModal = function () {
+    document.getElementById("rawgSearchInput").value = "";
+    document.getElementById("rawgSearchResults").style.display = "none";
+    document.getElementById("rawgImportForm").style.display = "none";
+    document.getElementById("importConfirmBtn").style.display = "none";
+    document.getElementById("rawgResultsList").innerHTML = "";
+    document.getElementById("selectedRawgId").value = "";
+    new bootstrap.Modal(document.getElementById("importRawgModal")).show();
+  };
+
+  window.searchRawgGames = async function () {
+    const query = document.getElementById("rawgSearchInput").value.trim();
+    if (!query) {
+      showToast("warning", "⚠️", "Ingresa el nombre de un juego.");
+      return;
+    }
+
+    try {
+      showToast("info", "🔍", "Buscando en RAWG...");
+      const results = await fetch(
+        `http://localhost:8080/api/rawg/buscar?q=${encodeURIComponent(query)}`,
+      ).then((r) => r.json());
+
+      if (!results || results.length === 0) {
+        showToast("warning", "⚠️", "No se encontraron juegos con ese nombre.");
+        document.getElementById("rawgSearchResults").style.display = "none";
+        return;
+      }
+
+      // Mostrar resultados
+      const resultsList = document.getElementById("rawgResultsList");
+      resultsList.innerHTML = results
+        .map((game) => {
+          const gameName = game.nombre || game.name || "Juego sin nombre";
+          const gameId = game.id;
+          return `
+        <div style="padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.02);" 
+             onclick="selectRawgGame(${gameId}, '${gameName.replace(/'/g, "\\'")}')">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="color: #fff;">${gameName}</strong>
+              <div style="font-size: 0.85rem; color: var(--muted); margin-top: 4px;">
+                Géneros: ${game.genres && game.genres.length > 0 ? game.genres.map((g) => g.name || g).join(", ") : "N/A"}
+              </div>
+            </div>
+            <div style="color: var(--red); font-weight: bold;">Seleccionar →</div>
+          </div>
+        </div>
+      `;
+        })
+        .join("");
+
+      document.getElementById("rawgSearchResults").style.display = "block";
+      showToast("success", "✅", `Se encontraron ${results.length} juego(s).`);
+    } catch (error) {
+      showToast("danger", "❌", "Error al buscar: " + error.message);
+    }
+  };
+
+  window.selectRawgGame = function (rawgId, gameName) {
+    document.getElementById("selectedRawgId").value = rawgId;
+    document.getElementById("selectedGameTitle").value = gameName;
+    document.getElementById("rawgImportForm").style.display = "block";
+    document.getElementById("importConfirmBtn").style.display = "inline-block";
+    document.getElementById("rawgSearchResults").style.display = "none";
+  };
+
+  window.confirmImportGame = async function () {
+    const rawgId = parseInt(document.getElementById("selectedRawgId").value);
+    const plataforma = document.getElementById("importPlatform").value;
+    const precio = parseInt(document.getElementById("importPrice").value);
+    const stock = parseInt(document.getElementById("importStock").value);
+
+    if (!rawgId || !precio || !stock) {
+      showToast("warning", "⚠️", "Completa todos los campos.");
+      return;
+    }
+
+    try {
+      showToast("info", "⏳", "Importando juego...");
+      const result = await ProductoAPI.importar({
+        rawgId,
+        precio,
+        stock,
+        plataforma,
+      });
+
+      // Mapear campos del backend al formato del frontend
+      const bgMap = {
+        PS5: "game-thumb-purple",
+        Xbox: "game-thumb-red",
+        Switch: "game-thumb-green",
+        PC: "game-thumb-blue",
+      };
+
+      const productoMapeado = {
+        id: result.id,
+        title: result.titulo,
+        platform: result.plataforma,
+        genre: result.genero || "Acción",
+        price: result.precio,
+        rating: result.rating || 4.5,
+        stock: result.stock,
+        status: result.estado ? result.estado.toLowerCase() : "disponible",
+        emoji: result.emoji || "🎮",
+        bg: bgMap[result.plataforma] || "game-thumb-purple",
+        tag: "",
+        tagClass: "",
+        description: "",
+      };
+
+      // Agregar a la lista local
+      products.push(productoMapeado);
+      filteredProds = [...products];
+      filterTable();
+
+      bootstrap.Modal.getInstance(
+        document.getElementById("importRawgModal"),
+      ).hide();
+      showToast("success", "✅", `"${result.titulo}" importado correctamente.`);
+    } catch (error) {
+      showToast("danger", "❌", "Error al importar: " + error.message);
+    }
+  };
+
   // Iniciar admin
-  renderTable();
+  cargarProductos();
 }
 
 // ==========================================
@@ -437,16 +563,20 @@ if (registerForm) {
   registerForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    const nombre   = document.getElementById("regNombre").value.trim();
+    const nombre = document.getElementById("regNombre").value.trim();
     const apellido = document.getElementById("regApellido").value.trim();
-    const email    = document.getElementById("regEmail").value.trim();
+    const email = document.getElementById("regEmail").value.trim();
     const password = document.getElementById("regPassword").value.trim();
 
-    const errorMsg   = document.getElementById("registerError");
+    const errorMsg = document.getElementById("registerError");
     const successMsg = document.getElementById("successMessage");
 
     try {
-      await AuthAPI.registro({ nombre: nombre + " " + apellido, email, password });
+      await AuthAPI.registro({
+        nombre: nombre + " " + apellido,
+        email,
+        password,
+      });
 
       // Registro exitoso: mostrar mensaje y cerrar modal
       if (successMsg) successMsg.classList.remove("d-none");
@@ -454,19 +584,17 @@ if (registerForm) {
 
       setTimeout(() => {
         const modal = bootstrap.Modal.getInstance(
-          document.getElementById("registerModal")
+          document.getElementById("registerModal"),
         );
         modal.hide();
         if (successMsg) successMsg.classList.add("d-none");
       }, 2000);
-
     } catch (err) {
       // El backend lanza "Email ya existe" cuando el correo está duplicado
       if (errorMsg) {
-        errorMsg.textContent =
-          err.message.includes("ya existe")
-            ? "Este correo ya está registrado."
-            : "Error al registrar. Intenta de nuevo.";
+        errorMsg.textContent = err.message.includes("ya existe")
+          ? "Este correo ya está registrado."
+          : "Error al registrar. Intenta de nuevo.";
         errorMsg.classList.remove("d-none");
       }
     }
@@ -481,7 +609,7 @@ if (loginForm) {
   loginForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    const email    = document.getElementById("loginEmail").value.trim();
+    const email = document.getElementById("loginEmail").value.trim();
     const password = document.getElementById("loginPassword").value.trim();
     const errorMsg = document.getElementById("loginError");
 
@@ -489,15 +617,18 @@ if (loginForm) {
       const usuario = await AuthAPI.login({ email, password });
 
       // Guardamos solo datos no sensibles en sessionStorage
-      sessionStorage.setItem("usuarioActivo", JSON.stringify({
-        id:      usuario.id,
-        nombre:  usuario.nombre,
-        email:   usuario.email,
-        rol:     usuario.rol,
-      }));
+      sessionStorage.setItem(
+        "usuarioActivo",
+        JSON.stringify({
+          id: usuario.id,
+          nombre: usuario.nombre,
+          email: usuario.email,
+          rol: usuario.rol,
+        }),
+      );
 
       const modal = bootstrap.Modal.getInstance(
-        document.getElementById("loginModal")
+        document.getElementById("loginModal"),
       );
       modal.hide();
       loginForm.reset();
@@ -509,7 +640,6 @@ if (loginForm) {
       if (usuario.rol === "ADMIN") {
         window.location.href = "admin.html";
       }
-
     } catch (err) {
       if (errorMsg) {
         errorMsg.textContent = "Correo o contraseña incorrectos.";
@@ -525,13 +655,13 @@ if (loginForm) {
 function actualizarInterfaz() {
   const sesion = JSON.parse(sessionStorage.getItem("usuarioActivo"));
 
-  const botonesAuth  = document.getElementById("navAuthButtons");
+  const botonesAuth = document.getElementById("navAuthButtons");
   const perfilUsuario = document.getElementById("navUserProfile");
-  const nombreTxt    = document.getElementById("userNameDisplay");
+  const nombreTxt = document.getElementById("userNameDisplay");
   const avatarCirculo = document.getElementById("userAvatarInitials");
 
   if (sesion) {
-    if (botonesAuth)   botonesAuth.classList.add("d-none");
+    if (botonesAuth) botonesAuth.classList.add("d-none");
     if (perfilUsuario) perfilUsuario.classList.remove("d-none");
 
     if (nombreTxt) nombreTxt.textContent = sesion.nombre;
@@ -543,7 +673,7 @@ function actualizarInterfaz() {
       avatarCirculo.textContent = iniciales.toUpperCase();
     }
   } else {
-    if (botonesAuth)   botonesAuth.classList.remove("d-none");
+    if (botonesAuth) botonesAuth.classList.remove("d-none");
     if (perfilUsuario) perfilUsuario.classList.add("d-none");
   }
 }
