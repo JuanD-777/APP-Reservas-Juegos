@@ -29,4 +29,11 @@ public class UsuarioController {
         Usuario usuario = usuarioService.obtenerUsuario(id);
         return usuario != null ? ResponseEntity.ok(usuario) : ResponseEntity.notFound().build();
     }
+
+    // Cambiar rol de usuario
+    @PatchMapping("/{id}/rol")
+    public ResponseEntity<?> cambiarRol(@PathVariable Long id, @RequestParam String rol) {
+        Usuario usuario = usuarioService.cambiarRol(id, rol);
+        return usuario != null ? ResponseEntity.ok(usuario) : ResponseEntity.notFound().build();
+    }
 }
