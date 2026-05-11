@@ -641,7 +641,13 @@ if (document.getElementById("galleryMain")) {
         fechaDevolucion: fechaISO(selectedDetailDays),
         tipo: "NORMAL",
       });
-      alert("Reserva creada correctamente.");
+
+      const codigo = "PLR-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+      const codigoEl = document.getElementById("codigoReserva");
+      if (codigoEl) codigoEl.textContent = codigo;
+      const modal = new bootstrap.Modal(document.getElementById("modalReservaExitosa"));
+      modal.show();
+
       currentDetailProduct = await ProductoAPI.obtener(currentDetailProduct.id);
       renderDetail(currentDetailProduct);
       await cargarDatosExtraDetalle(currentDetailProduct);

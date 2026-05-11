@@ -36,85 +36,36 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul
-            class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-2 align-items-center"
-          >
-            <a href="catalogo.html" class="btn-ver">VER TODOS →</a>
-            <li class="nav-item">
-              <a class="nav-link" href="#categorias">Categorías</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#catalogo">Novedades</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#planes">Planes</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#comunidad">Comunidad</a>
-            </li>
+          <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-3 align-items-center">
+            <li class="nav-item"><a class="nav-link" href="catalogo.html">Explorar</a></li>
+            <li class="nav-item"><a class="nav-link" href="#categorias">Categorías</a></li>
+            <li class="nav-item"><a class="nav-link" href="#catalogo">Novedades</a></li>
+            <li class="nav-item"><a class="nav-link" href="#planes">Planes</a></li>
+            <li class="nav-item"><a class="nav-link" href="#comunidad">Comunidad</a></li>
           </ul>
 
-          <div class="d-flex align-items-center gap-2 ms-lg-3 mt-3 mt-lg-0">
+          <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
             <div id="navAuthButtons" class="d-flex gap-2">
-              <a
-                href="#"
-                class="btn btn-login btn-sm"
-                data-bs-toggle="modal"
-                data-bs-target="#loginModal"
-                >Iniciar sesión</a
-              >
-              <a
-                href="#"
-                class="btn btn-login btn-sm"
-                data-bs-toggle="modal"
-                data-bs-target="#registerModal"
-                >Registrarse</a
-              >
+              <a href="#" class="btn btn-login btn-sm" data-bs-toggle="modal" data-bs-target="#loginModal">Iniciar sesión</a>
+              <a href="#" class="btn btn-reservar btn-sm" data-bs-toggle="modal" data-bs-target="#registerModal">Registrarse</a>
             </div>
 
-            <div
-              id="navUserProfile"
-              class="d-none d-flex align-items-center gap-3"
-            >
+            <div id="navUserProfile" class="d-none d-flex align-items-center">
               <div class="dropdown">
-                <div
-                  class="d-flex align-items-center gap-2"
-                  data-bs-toggle="dropdown"
-                  style="cursor: pointer;"
-                >
-                  <span
-                    id="userNameDisplay"
-                    class="fw-bold"
-                    style="color: aliceblue; font-size: 0.9rem"
-                  ></span>
-                  <div
-                    id="userAvatarInitials"
+                <div class="d-flex align-items-center gap-2" data-bs-toggle="dropdown" style="cursor:pointer;">
+                  <span id="userNameDisplay" class="fw-bold" style="color:aliceblue;font-size:0.9rem;"></span>
+                  <div id="userAvatarInitials"
                     class="rounded-circle d-flex justify-content-center align-items-center fw-bold"
-                    style="
-                      width: 35px;
-                      height: 35px;
-                      font-size: 0.8rem;
-                      background-color: var(--red);
-                      color: white;
-                    "
-                  ></div>
+                    style="width:36px;height:36px;font-size:0.8rem;background-color:var(--red);color:white;">
+                  </div>
                 </div>
-                <ul class="dropdown-menu dropdown-menu-end" style="background-color: #1a1a2e; border: 1px solid rgba(255,255,255,0.1);">
-                  <li>
-                    <a id="btnPanelAdmin" href="admin.html" class="dropdown-item d-none" style="color: var(--red); font-weight: 600;">
-                      Panel Admin
-                    </a>
-                  </li>
-                  <li>
-                    <button class="dropdown-item" style="color: white;" onclick="cerrarSesion()">
-                      Salir
-                    </button>
-                  </li>
+                <ul class="dropdown-menu dropdown-menu-end" style="background-color:#1a1a2e;border:1px solid rgba(255,255,255,0.1);">
+                  <li><a id="btnPanelAdmin" href="admin.html" class="dropdown-item d-none" style="color:var(--red);font-weight:600;">Panel Admin</a></li>
+                  <li><a href="mis-reservas.html" class="dropdown-item" style="color:white;">Mis Reservas</a></li>
+                  <li><button class="dropdown-item" style="color:white;" onclick="cerrarSesion()">Salir</button></li>
                 </ul>
               </div>
             </div>
-
-            <a href="#" class="btn btn-reservar btn-sm">Reservar ahora →</a>
           </div>
         </div>
       </div>
