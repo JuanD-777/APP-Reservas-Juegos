@@ -38,16 +38,6 @@ public class AuthController {
             String email = body.get("email");
             String password = body.get("password");
 
-            // Verificar si es admin
-            if (usuarioService.esAdmin(email, password)) {
-                return ResponseEntity.ok(Map.of(
-                        "id", 0L,
-                        "email", email,
-                        "nombre", "Administrador",
-                        "rol", "ADMIN"
-                ));
-            }
-
             Usuario usuario = usuarioService.login(email, password);
             return ResponseEntity.ok(usuario);
         } catch (Exception e) {
@@ -55,16 +45,9 @@ public class AuthController {
         }
     }
 
-    // Logut de usuario
+    // Logout de usuario
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
         return ResponseEntity.ok(Map.of("mensaje", "Sesión cerrada"));
-    }
-
-    // Verificar si el usuario es admin
-    @GetMapping("/verificar-admin")
-    public ResponseEntity<?> verificarAdmin(@RequestParam String email, @RequestParam String password) {
-        boolean esAdmin = usuarioService.esAdmin(email, password);
-        return ResponseEntity.ok(Map.of("esAdmin", esAdmin));
     }
 }

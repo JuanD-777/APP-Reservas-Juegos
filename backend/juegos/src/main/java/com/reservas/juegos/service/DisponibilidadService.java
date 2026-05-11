@@ -1,33 +1,26 @@
 package com.reservas.juegos.service;
 
-import com.reservas.juegos.entities.Producto;
+import com.reservas.juegos.repository.ProductoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class DisponibilidadService {
-    private final List<Producto> productos = new ArrayList<>();
 
-    public void agregarProducto(Producto producto) {
-        productos.add(producto);
-    }
+    @Autowired
+    private ProductoRepository productoRepository;
 
     public boolean verificarDisponibilidad(Long id) {
-        return productos.stream()
-                .filter(p -> p.getId() != null && p.getId().equals(id))
-                .map(p -> p.getEstado() != null && p.getEstado().equalsIgnoreCase("disponible"))
-                .findFirst()
+        return productoRepository.findById(id)
+                .map(p -> p.getStock() > 0 && !"agotado".equalsIgnoreCase(p.getEstado()))
                 .orElse(false);
     }
 
     public boolean cambiarDisponibilidad(Long id, boolean disponible) {
-        return productos.stream()
-                .filter(p -> p.getId() != null && p.getId().equals(id))
-                .findFirst()
+        return productoRepository.findById(id)
                 .map(p -> {
                     p.setEstado(disponible ? "disponible" : "no_disponible");
+                    productoRepository.save(p);
                     return true;
                 })
                 .orElse(false);
