@@ -4,29 +4,55 @@ import com.reservas.juegos.service.DisponibilidadService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
-@RequestMapping("/disponibilidad")
+@RequestMapping("/api/disponibilidad")
 @CrossOrigin(origins = "*")
 public class DisponibilidadController {
+
     private final DisponibilidadService disponibilidadService;
 
     public DisponibilidadController(DisponibilidadService disponibilidadService) {
         this.disponibilidadService = disponibilidadService;
     }
 
+    // Verificar disponibilidad por ID
     @GetMapping("/{id}")
-    public ResponseEntity<String> verificar(@PathVariable Long id) {
+    public ResponseEntity<?> verificar(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("El ID debe ser un número válido mayor a 0");
+        }
+        
         boolean disponible = disponibilidadService.verificarDisponibilidad(id);
-        return ResponseEntity.ok(disponible ? "Disponible" : "No disponible");
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", disponible ? "Disponible" : "No disponible");
+        response.put("id", id);
+        response.put("disponible", disponible);
+        
+        return ResponseEntity.ok(response);
     }
 
+    // Cambiar disponibilidad
     @PutMapping("/{id}")
-    public ResponseEntity<String> cambiar(@PathVariable Long id, @RequestParam boolean disponible) {
+    public ResponseEntity<?> cambiar(@PathVariable Long id, @RequestParam boolean disponible) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("El ID debe ser un número válido mayor a 0");
+        }
+        
         boolean actualizado = disponibilidadService.cambiarDisponibilidad(id, disponible);
+        
         if (actualizado) {
-            return ResponseEntity.ok("Disponibilidad actualizada a: " + (disponible ? "Disponible" : "No disponible"));
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Disponibilidad actualizada exitosamente");
+            response.put("id", id);
+            response.put("disponible", disponible);
+            response.put("estado", disponible ? "Disponible" : "No disponible");
+            return ResponseEntity.ok(response);
         } else {
-            return ResponseEntity.notFound().build();
+            throw new RuntimeException("Recurso con id " + id + " no encontrado");
         }
     }
 }

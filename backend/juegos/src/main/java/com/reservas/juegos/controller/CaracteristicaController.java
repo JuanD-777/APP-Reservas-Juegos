@@ -8,18 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-/**
- * #17 Administrar característica de producto
- *
- * Endpoints:
- *   GET    /api/caracteristicas              → listar todas
- *   GET    /api/caracteristicas/{id}         → buscar por id
- *   POST   /api/caracteristicas              → agregar característica
- *   PUT    /api/caracteristicas/{id}         → actualizar característica
- *   DELETE /api/caracteristicas/{id}         → eliminar característica
- */
 @RestController
 @RequestMapping("/api/caracteristicas")
 @CrossOrigin(origins = "*")
@@ -29,39 +21,89 @@ public class CaracteristicaController {
     private CaracteristicaService caracteristicaService;
 
     @GetMapping
-    public ResponseEntity<List<Caracteristica>> listarTodas() {
-        return ResponseEntity.ok(caracteristicaService.listarTodas());
+    public ResponseEntity<?> listarTodas() {
+        List<Caracteristica> caracteristicas = caracteristicaService.listarTodas();
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", caracteristicas.isEmpty() ? "No hay características registradas" : "Listado de características");
+        response.put("cantidad", caracteristicas.size());
+        response.put("caracteristicas", caracteristicas);
+        
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Caracteristica> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("El ID debe ser un número válido mayor a 0");
+        }
+        
         return caracteristicaService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(caracteristica -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("message", "Característica encontrada");
+                    response.put("caracteristica", caracteristica);
+                    return ResponseEntity.ok(response);
+                })
+                .orElseThrow(() -> new RuntimeException("Característica con id " + id + " no encontrada"));
     }
 
     @PostMapping
     public ResponseEntity<?> agregar(@RequestBody CaracteristicaDTO dto) {
-        if (dto.getClave() == null || dto.getClave().isBlank()
-                || dto.getValor() == null || dto.getValor().isBlank()) {
-            return ResponseEntity.badRequest().body("Clave y valor son obligatorios.");
+        if (dto == null) {
+            throw new IllegalArgumentException("Los datos de la característica son requeridos");
         }
+        if (dto.getClave() == null || dto.getClave().isBlank()) {
+            throw new IllegalArgumentException("La clave de la característica es obligatoria");
+        }
+        if (dto.getValor() == null || dto.getValor().isBlank()) {
+            throw new IllegalArgumentException("El valor de la característica es obligatorio");
+        }
+        
         return caracteristicaService.crear(dto)
-                .map(c -> ResponseEntity.status(HttpStatus.CREATED).body((Object) c))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado."));
+                .map(caracteristica -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("message", "Característica creada exitosamente");
+                    response.put("caracteristica", caracteristica);
+                    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+                })
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado para asociar la característica"));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody CaracteristicaDTO dto) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("El ID debe ser un número válido mayor a 0");
+        }
+        if (dto == null) {
+            throw new IllegalArgumentException("Los datos para actualizar son requeridos");
+        }
+        
         return caracteristicaService.actualizar(id, dto)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(caracteristica -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("message", "Característica actualizada exitosamente");
+                    response.put("caracteristica", caracteristica);
+                    return ResponseEntity.ok(response);
+                })
+                .orElseThrow(() -> new RuntimeException("Característica con id " + id + " no encontrada"));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        return caracteristicaService.eliminar(id)
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+    public ResponseEntity<?> eliminar(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("El ID debe ser un número válido mayor a 0");
+        }
+        
+        boolean eliminado = caracteristicaService.eliminar(id);
+        
+        if (eliminado) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Característica eliminada exitosamente");
+            response.put("id_eliminado", id);
+            return ResponseEntity.ok(response);
+        } else {
+            throw new RuntimeException("Característica con id " + id + " no encontrada");
+        }
     }
 }

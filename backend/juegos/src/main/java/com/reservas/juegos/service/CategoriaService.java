@@ -24,32 +24,33 @@ public class CategoriaService {
     }
 
     public Categoria crear(CategoriaDTO dto) {
-        Categoria categoria = new Categoria(
-                dto.getNombre(),
-                dto.getEmoji(),
-                dto.getCantidadJuegos()
-        );
+        // Validación para evitar duplicados
+        if (categoriaRepository.existsByNombre(dto.getNombre())) {
+            throw new RuntimeException("Ya existe una categoría con el nombre: " + dto.getNombre());
+        }
+        
+        Categoria categoria = new Categoria();
+        categoria.setNombre(dto.getNombre());
         return categoriaRepository.save(categoria);
     }
 
     public Optional<Categoria> actualizar(Long id, CategoriaDTO dto) {
-        return categoriaRepository.findById(id).map(cat -> {
-            cat.setNombre(dto.getNombre());
-            cat.setEmoji(dto.getEmoji());
-            cat.setCantidadJuegos(dto.getCantidadJuegos());
-            return categoriaRepository.save(cat);
+        return categoriaRepository.findById(id).map(categoria -> {
+            // Validación para evitar duplicados en actualización
+            if (categoriaRepository.existsByNombre(dto.getNombre()) && 
+                !categoria.getNombre().equalsIgnoreCase(dto.getNombre())) {
+                throw new RuntimeException("Ya existe una categoría con el nombre: " + dto.getNombre());
+            }
+            categoria.setNombre(dto.getNombre());
+            return categoriaRepository.save(categoria);
         });
     }
 
     public boolean eliminar(Long id) {
-        if (!categoriaRepository.existsById(id)) {
-            return false;
+        if (categoriaRepository.existsById(id)) {
+            categoriaRepository.deleteById(id);
+            return true;
         }
-        categoriaRepository.deleteById(id);
-        return true;
-    }
-
-    public boolean existePorNombre(String nombre) {
-        return categoriaRepository.existsByNombre(nombre);
+        return false;
     }
 }

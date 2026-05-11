@@ -11,25 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-/**
- * Endpoints:
- *   GET    /api/productos                          → listar todos
- *   GET    /api/productos/{id}                     → buscar por id
- *   POST   /api/productos                          → crear producto        → 201 + producto creado
- *   PUT    /api/productos/{id}                     → actualizar producto   → 200 + producto actualizado
- *   DELETE /api/productos/{id}                     → eliminar producto     → 200 + mensaje confirmación
- *   POST   /api/productos/{id}/categorias/{catId}  → asignar categoría     → 200 + producto
- *   DELETE /api/productos/{id}/categorias/{catId}  → quitar categoría      → 200 + producto
- *   GET    /api/productos/{id}/caracteristicas     → ver características
- *   GET    /api/productos/{id}/politicas           → ver políticas
- *   GET    /api/productos/{id}/compartir           → datos para compartir
- *   POST   /api/productos/{id}/puntuar             → puntuar producto
- *   POST   /api/productos/importarRawg             → importar juego desde RAWG
- */
 @RestController
 @RequestMapping("/api/productos")
 @CrossOrigin(origins = "*")
@@ -42,18 +27,27 @@ public class ProductoController {
     private CaracteristicaService caracteristicaService;
 
     // ── GET /api/productos ──────────────────────────────────────────────────────
-    // Listar todos (con paginación opcional via ?page=0&size=10)
     @GetMapping
     public ResponseEntity<?> listarTodos(
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
 
         if (page == null || size == null) {
-            return ResponseEntity.ok(productoService.listarTodos());
+            List<Producto> productos = productoService.listarTodos();
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", productos.isEmpty() ? "No hay productos registrados" : "Listado de productos");
+            response.put("cantidad", productos.size());
+            response.put("productos", productos);
+            return ResponseEntity.ok(response);
+        }
+
+        if (page < 0 || size <= 0) {
+            throw new IllegalArgumentException("La página debe ser mayor o igual a 0 y el tamaño mayor a 0");
         }
 
         Page<Producto> productosPage = productoService.listarPaginado(page, size);
         Map<String, Object> response = new HashMap<>();
+        response.put("message", "Listado paginado de productos");
         response.put("contenido", productosPage.getContent());
         response.put("paginaActual", productosPage.getNumber());
         response.put("totalElementos", productosPage.getTotalElements());
@@ -64,128 +58,234 @@ public class ProductoController {
 
     // ── GET /api/productos/{id} ─────────────────────────────────────────────────
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("El ID debe ser un número válido mayor a 0");
+        }
+
         return productoService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(producto -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("message", "Producto encontrado");
+                    response.put("producto", producto);
+                    return ResponseEntity.ok(response);
+                })
+                .orElseThrow(() -> new RuntimeException("Producto con id " + id + " no encontrado"));
     }
 
     // ── POST /api/productos ─────────────────────────────────────────────────────
-    // Recibe Producto directo (sin DTO), devuelve 201 + producto creado
     @PostMapping
     public ResponseEntity<?> crear(@RequestBody Producto producto) {
-        try {
-            Producto creado = productoService.crear(producto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(creado);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        if (producto == null) {
+            throw new IllegalArgumentException("Los datos del producto son requeridos");
         }
+        if (producto.getTitulo() == null || producto.getTitulo().isBlank()) {
+            throw new IllegalArgumentException("El título del producto es obligatorio");
+        }
+        if (producto.getPrecio() == null || producto.getPrecio() <= 0) {
+            throw new IllegalArgumentException("El precio del producto debe ser mayor a 0");
+        }
+
+        Producto creado = productoService.crear(producto);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Producto creado exitosamente");
+        response.put("producto", creado);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // ── PUT /api/productos/{id} ─────────────────────────────────────────────────
-    // Recibe Producto directo, devuelve 200 + producto actualizado
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizar(
-            @PathVariable Long id,
-            @RequestBody Producto datos) {
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody Producto datos) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("El ID debe ser un número válido mayor a 0");
+        }
+        if (datos == null) {
+            throw new IllegalArgumentException("Los datos para actualizar son requeridos");
+        }
+
         return productoService.actualizar(id, datos)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(producto -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("message", "Producto actualizado exitosamente");
+                    response.put("producto", producto);
+                    return ResponseEntity.ok(response);
+                })
+                .orElseThrow(() -> new RuntimeException("Producto con id " + id + " no encontrado"));
     }
 
     // ── DELETE /api/productos/{id} ──────────────────────────────────────────────
-    // Devuelve 204 No Content si se eliminó, 404 si no existe
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        return productoService.eliminar(id)
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+    public ResponseEntity<?> eliminar(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("El ID debe ser un número válido mayor a 0");
+        }
+
+        boolean eliminado = productoService.eliminar(id);
+        
+        if (eliminado) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Producto eliminado exitosamente");
+            response.put("id_eliminado", id);
+            return ResponseEntity.ok(response);
+        } else {
+            throw new RuntimeException("Producto con id " + id + " no encontrado");
+        }
     }
 
     // ── POST /api/productos/{id}/categorias/{categoriaId} ──────────────────────
-    // #12 Asignar categoría a producto
     @PostMapping("/{id}/categorias/{categoriaId}")
-    public ResponseEntity<Producto> asignarCategoria(
+    public ResponseEntity<?> asignarCategoria(
             @PathVariable("id") Long productoId,
             @PathVariable Long categoriaId) {
+        
+        if (productoId == null || productoId <= 0) {
+            throw new IllegalArgumentException("El ID del producto debe ser mayor a 0");
+        }
+        if (categoriaId == null || categoriaId <= 0) {
+            throw new IllegalArgumentException("El ID de la categoría debe ser mayor a 0");
+        }
+
         return productoService.asignarCategoria(productoId, categoriaId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(producto -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("message", "Categoría asignada exitosamente");
+                    response.put("producto", producto);
+                    return ResponseEntity.ok(response);
+                })
+                .orElseThrow(() -> new RuntimeException("Producto o categoría no encontrado"));
     }
 
     // ── DELETE /api/productos/{id}/categorias/{categoriaId} ────────────────────
-    // Quitar categoría de producto → devuelve 200 + producto actualizado
     @DeleteMapping("/{id}/categorias/{categoriaId}")
-    public ResponseEntity<Producto> quitarCategoria(
+    public ResponseEntity<?> quitarCategoria(
             @PathVariable("id") Long productoId,
             @PathVariable Long categoriaId) {
+        
+        if (productoId == null || productoId <= 0) {
+            throw new IllegalArgumentException("El ID del producto debe ser mayor a 0");
+        }
+        if (categoriaId == null || categoriaId <= 0) {
+            throw new IllegalArgumentException("El ID de la categoría debe ser mayor a 0");
+        }
+
         return productoService.quitarCategoria(productoId, categoriaId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(producto -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("message", "Categoría removida exitosamente");
+                    response.put("producto", producto);
+                    return ResponseEntity.ok(response);
+                })
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
     }
 
     // ── GET /api/productos/{id}/caracteristicas ─────────────────────────────────
     @GetMapping("/{id}/caracteristicas")
-    public ResponseEntity<List<Caracteristica>> verCaracteristicas(@PathVariable Long id) {
+    public ResponseEntity<?> verCaracteristicas(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("El ID debe ser mayor a 0");
+        }
+
         return caracteristicaService.verCaracteristicasDeProducto(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(caracteristicas -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("message", "Características del producto");
+                    response.put("productoId", id);
+                    response.put("cantidad", caracteristicas.size());
+                    response.put("caracteristicas", caracteristicas);
+                    return ResponseEntity.ok(response);
+                })
+                .orElseThrow(() -> new RuntimeException("Producto con id " + id + " no encontrado"));
     }
 
     // ── GET /api/productos/{id}/politicas ───────────────────────────────────────
-    // #26 Ver bloque de políticas del producto
     @GetMapping("/{id}/politicas")
     public ResponseEntity<?> verPoliticas(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("El ID debe ser mayor a 0");
+        }
+
         return productoService.obtenerPoliticas(id)
-                .map(pol -> ResponseEntity.ok((Object) Map.of("politicas", pol != null ? pol : "")))
-                .orElse(ResponseEntity.notFound().build());
+                .map(politicas -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("message", "Políticas del producto");
+                    response.put("productoId", id);
+                    response.put("politicas", politicas != null ? politicas : "Sin políticas definidas");
+                    return ResponseEntity.ok(response);
+                })
+                .orElseThrow(() -> new RuntimeException("Producto con id " + id + " no encontrado"));
     }
 
     // ── GET /api/productos/{id}/compartir ───────────────────────────────────────
-    // #27 Compartir producto en redes sociales
     @GetMapping("/{id}/compartir")
-    public ResponseEntity<Map<String, String>> compartir(@PathVariable Long id) {
+    public ResponseEntity<?> compartir(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("El ID debe ser mayor a 0");
+        }
+
         return productoService.obtenerDatosCompartir(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(datos -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("message", "Datos para compartir");
+                    response.put("productoId", id);
+                    response.put("datos", datos);
+                    return ResponseEntity.ok(response);
+                })
+                .orElseThrow(() -> new RuntimeException("Producto con id " + id + " no encontrado"));
     }
 
     // ── POST /api/productos/{id}/puntuar ────────────────────────────────────────
-    // #28 Puntuar producto → body: { "puntuacion": 4.5 }
     @PostMapping("/{id}/puntuar")
-    public ResponseEntity<?> puntuar(
-            @PathVariable Long id,
-            @RequestBody Map<String, Double> body) {
+    public ResponseEntity<?> puntuar(@PathVariable Long id, @RequestBody Map<String, Double> body) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("El ID debe ser mayor a 0");
+        }
 
         Double puntuacion = body.get("puntuacion");
         if (puntuacion == null) {
-            return ResponseEntity.badRequest().body(Map.of("error", "El campo 'puntuacion' es obligatorio."));
+            throw new IllegalArgumentException("El campo 'puntuacion' es obligatorio");
         }
         if (puntuacion < 1 || puntuacion > 5) {
-            return ResponseEntity.badRequest().body(Map.of("error", "La puntuación debe estar entre 1 y 5."));
+            throw new IllegalArgumentException("La puntuación debe estar entre 1 y 5");
         }
 
         return productoService.puntuar(id, puntuacion)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(producto -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("message", "Producto puntuado exitosamente");
+                    response.put("productoId", id);
+                    response.put("puntuacion", puntuacion);
+                    response.put("promedio", producto.getRating());
+                    return ResponseEntity.ok(response);
+                })
+                .orElseThrow(() -> new RuntimeException("Producto con id " + id + " no encontrado"));
     }
 
     // ── POST /api/productos/importarRawg ────────────────────────────────────────
-    // #38 Importar juego desde RAWG
-    // Body esperado: { "rawgId": 3498, "precio": 59.99, "stock": 10, "plataforma": "PC" }
     @PostMapping("/importarRawg")
     public ResponseEntity<?> importarRawg(@RequestBody ProductoDTO dto) {
-        try {
-            Producto nuevo = productoService.importarDesdeRawg(
-                    dto.getRawgId(),
-                    dto.getPrecio(),
-                    dto.getStock(),
-                    dto.getPlataforma()
-            );
-            return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
+        if (dto == null) {
+            throw new IllegalArgumentException("Los datos para importar son requeridos");
         }
+        if (dto.getRawgId() == null || dto.getRawgId() <= 0) {
+            throw new IllegalArgumentException("El ID de RAWG es obligatorio");
+        }
+        if (dto.getPrecio() == null || dto.getPrecio() <= 0) {
+            throw new IllegalArgumentException("El precio es obligatorio y debe ser mayor a 0");
+        }
+
+        Producto nuevo = productoService.importarDesdeRawg(
+            dto.getRawgId(),
+            dto.getPrecio(),
+            dto.getStock(),
+            dto.getPlataforma()
+        );
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Producto importado desde RAWG exitosamente");
+        response.put("producto", nuevo);
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

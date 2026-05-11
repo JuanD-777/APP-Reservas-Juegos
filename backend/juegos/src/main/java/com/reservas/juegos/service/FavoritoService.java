@@ -43,4 +43,29 @@ public class FavoritoService {
     public List<Favorito> listarFavoritos() {
         return favoritoRepository.findAll();
     }
+
+    public List<Favorito> listarPorUsuario(Long usuarioId) {
+        return favoritoRepository.findByUsuarioId(usuarioId);
+    }
+
+    public boolean eliminarFavorito(Long id) {
+        if (favoritoRepository.existsById(id)) {
+            favoritoRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean eliminarFavoritoPorUsuarioYProducto(Long usuarioId, Long productoId) {
+        return favoritoRepository.findByUsuarioIdAndProductoId(usuarioId, productoId)
+                .map(favorito -> {
+                    favoritoRepository.delete(favorito);
+                    return true;
+                })
+                .orElse(false);
+    }
+
+    public boolean esFavorito(Long usuarioId, Long productoId) {
+        return favoritoRepository.existsByUsuarioIdAndProductoId(usuarioId, productoId);
+    }
 }
